@@ -21,6 +21,8 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-scripts --no-interaction
 
+RUN php artisan config:clear && php artisan cache:clear
+
 EXPOSE 8000
 
 CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$((PORT+0))"]
