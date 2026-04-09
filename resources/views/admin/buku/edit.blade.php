@@ -33,7 +33,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Pengarang <span class="text-danger">*</span></label>
+                            <label class="form-label">Penulis <span class="text-danger">*</span></label>
                             <input type="text" name="pengarang"
                                    class="form-control @error('pengarang') is-invalid @enderror"
                                    value="{{ old('pengarang', $book->pengarang) }}"
