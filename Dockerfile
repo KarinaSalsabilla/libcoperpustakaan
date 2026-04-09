@@ -21,7 +21,7 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-scripts --no-interaction
 
-RUN php artisan config:clear && php artisan cache:clear
+RUN rm -rf bootstrap/cache/*.php
 
 EXPOSE 8000
 
