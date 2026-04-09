@@ -5,15 +5,14 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libfreetype6-dev \
+    libzip-dev \
     zip \
     unzip \
     git \
-    curl \
-    || true
+    curl
 
-RUN docker-php-ext-configure gd --with-freetype || true
-
-RUN docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring zip bcmath || true
+RUN docker-php-ext-configure gd --with-freetype \
+    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring zip bcmath
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
