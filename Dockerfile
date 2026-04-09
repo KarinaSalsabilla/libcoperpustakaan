@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    curl
+    curl \
+    nodejs \
+    npm
 
 RUN docker-php-ext-configure gd --with-freetype \
     && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring zip bcmath
@@ -20,6 +22,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 RUN composer install --optimize-autoloader --no-scripts --no-interaction
+
+RUN npm install && npm run build
 
 RUN rm -rf bootstrap/cache/*.php
 
