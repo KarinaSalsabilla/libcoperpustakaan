@@ -4,14 +4,16 @@ WORKDIR /var/www/html
 
 RUN apt-get update && apt-get install -y \
     libpng-dev \
-    libjpeg-dev \
+    libjpeg62-turbo-dev \
     libfreetype6-dev \
     zip \
     unzip \
     git \
     curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql mbstring zip bcmath
+    && docker-php-ext-configure gd \
+        --with-freetype=/usr/include/ \
+        --with-jpeg=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring zip bcmath
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
