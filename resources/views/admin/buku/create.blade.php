@@ -316,7 +316,7 @@
               @error('judul_buku')<div class="eb-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="eb-group">
-              <label class="eb-label">Penulis <span class="req">*</span></label>
+              <label class="eb-label">Pengarang <span class="req">*</span></label>
               <input type="text" name="pengarang" class="eb-input @error('pengarang') is-invalid @enderror"
                      value="{{ old('pengarang') }}" maxlength="50" required placeholder="Nama pengarang...">
               @error('pengarang')<div class="eb-feedback">{{ $message }}</div>@enderror
