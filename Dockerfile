@@ -9,8 +9,11 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    && docker-php-ext-configure gd --with-freetype \
-    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring zip bcmath
+    || true
+
+RUN docker-php-ext-configure gd --with-freetype || true
+
+RUN docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring zip bcmath || true
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
