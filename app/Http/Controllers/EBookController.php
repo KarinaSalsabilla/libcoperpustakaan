@@ -41,8 +41,8 @@ class EBookController extends Controller
             'id_genre.*'   => 'exists:genres,id_genre',
             'sinopsis'     => 'nullable|string',
             'jumlah_ebook' => 'required|integer|min:1',
-            'cover'        => 'nullable|image|max:2048',
-            'file_ebook'   => 'nullable|mimes:pdf|max:10240',
+            'cover'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'file_ebook'   => 'nullable|mimes:pdf|max:51200',
         ]);
 
         $data = $request->only([
@@ -55,7 +55,6 @@ class EBookController extends Controller
             'jumlah_ebook',
         ]);
 
-        // Simpan genre sebagai string "1,2,3"
         $data['id_genre'] = null;
         if ($request->filled('id_genre')) {
             $data['id_genre'] = implode(',', array_slice($request->id_genre, 0, 3));
@@ -121,8 +120,8 @@ class EBookController extends Controller
             'id_genre.*'   => 'exists:genres,id_genre',
             'sinopsis'     => 'nullable|string',
             'jumlah_ebook' => 'required|integer|min:1',
-            'cover'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',  // 5MB
-            'file_ebook' => 'nullable|mimes:pdf|max:51200',  // 50MB
+            'cover'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'file_ebook'   => 'nullable|mimes:pdf|max:51200',
         ]);
 
         $data = $request->only([
@@ -135,16 +134,20 @@ class EBookController extends Controller
             'jumlah_ebook',
         ]);
 
-        // Simpan genre sebagai string "1,2,3"
         $data['id_genre'] = null;
         if ($request->filled('id_genre')) {
             $data['id_genre'] = implode(',', array_slice($request->id_genre, 0, 3));
         }
 
-        if ($book->cover) Storage::disk('supabase')->delete($book->cover);
-        $data['cover'] = $request->file('cover')->store('covers', 'supabase');
-        if ($book->file_ebook) Storage::disk('supabase')->delete($book->file_ebook);
-        $data['file_ebook'] = $request->file('file_ebook')->store('ebooks', 'supabase');
+        if ($request->hasFile('cover')) {
+            if ($book->cover) Storage::disk('supabase')->delete($book->cover);
+            $data['cover'] = $request->file('cover')->store('covers', 'supabase');
+        }
+
+        if ($request->hasFile('file_ebook')) {
+            if ($book->file_ebook) Storage::disk('supabase')->delete($book->file_ebook);
+            $data['file_ebook'] = $request->file('file_ebook')->store('ebooks', 'supabase');
+        }
 
         $book->update($data);
 
