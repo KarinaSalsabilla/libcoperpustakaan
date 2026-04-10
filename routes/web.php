@@ -174,8 +174,8 @@ Route::middleware(['auth', 'admin'])
         Route::delete('/buku/{id}',   [EBookController::class, 'destroy'])->name('buku.destroy');
     });
 
-    Route::get('/debug-disk', function () {
-    $book = DB::table('bukus')->first(); // ganti 'bukus' jika nama tabel berbeda
+  Route::get('/debug-disk', function () {
+    $book = DB::table('e_books')->first(); // coba ini
     return [
         'filesystem_disk' => config('filesystems.default'),
         'cover_path'      => $book->cover ?? 'null',
