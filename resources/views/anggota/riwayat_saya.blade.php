@@ -618,7 +618,7 @@
       </button>
       <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" title="{{ auth()->user()->name }}">
         @if(auth()->user()->anggota?->foto)
-          <img src="{{ asset('storage/foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
         @else
           {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
         @endif
@@ -773,7 +773,7 @@
                 <div class="td-book">
                   <div class="td-cover">
                     @if($loan->ebook->cover)
-                      <img src="{{ asset('storage/' . $loan->ebook->cover) }}" alt="">
+                      <img src="{{ Storage::url($loan->ebook->cover) }}" alt="">
                     @else
                       📚
                     @endif
@@ -838,7 +838,7 @@
                             data-id="{{ $loan->id_peminjam }}"
                             data-judul="{{ $loan->ebook->judul_buku ?? '—' }}"
                             data-penulis="{{ $loan->ebook->pengarang ?? '—' }}"
-                            data-cover="{{ $loan->ebook->cover ? asset('storage/' . $loan->ebook->cover) : '' }}"
+                            data-cover="{{ $loan->ebook->cover ? Storage::url($loan->ebook->cover) : '' }}"
                             data-action="{{ route('anggota.kembalikan', $loan->id_peminjam) }}">
                       <i class="fas fa-undo-alt"></i> Kembalikan
                     </button>

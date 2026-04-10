@@ -1385,7 +1385,7 @@
       <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" id="navAvatarLink"
         title="{{ auth()->user()->name }}">
         @if(auth()->user()->anggota?->foto)
-          <img src="{{ asset('storage/foto/' . auth()->user()->anggota->foto) }}" alt="avatar" id="navAvatarImg">
+          <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="avatar" id="navAvatarImg">
         @else
           <span id="navAvatarInitial">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
         @endif
@@ -1421,7 +1421,7 @@
         <div class="avatar-upload-wrap">
           <div class="avatar-display" onclick="triggerAvatarUpload()" title="Klik untuk mengganti foto profil">
             @if(auth()->user()->anggota?->foto)
-              <img src="{{ asset('storage/foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}"
+              <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}"
                 id="avatarPreview">
             @else
               <span class="avatar-initial" id="avatarInitialText">

@@ -34,7 +34,7 @@
                       justify-content:center;font-size:2.2rem;color:white;
                       background:rgba(255,255,255,.2);">
             @if($anggota->foto)
-              <img src="{{ asset('storage/foto/'.$anggota->foto) }}"
+              <img src="{{ Storage::url('foto/' . $anggota->foto) }}"
                    style="width:100%;height:100%;object-fit:cover;" alt="">
             @else
               {{ strtoupper(substr($anggota->nama ?? 'A', 0, 1)) }}

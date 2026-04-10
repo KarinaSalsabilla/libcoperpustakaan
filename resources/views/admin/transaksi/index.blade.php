@@ -146,7 +146,7 @@ td { padding:13px 16px; vertical-align:middle; }
             <div class="td-book">
               <div class="td-cover">
                 @if($t->ebook?->cover)
-                  <img src="{{ asset('storage/' . $t->ebook->cover) }}" alt="">
+                  <img src="{{ Storage::url($t->ebook->cover) }}" alt="">
                 @else
                   📚
                 @endif

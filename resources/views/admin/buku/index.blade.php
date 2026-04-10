@@ -137,7 +137,7 @@
                             <td>
                                 @if($book->cover)
                                     <div class="book-cover-wrapper">
-                                        <img src="{{ asset('storage/'.$book->cover) }}" 
+                                        <img src="{{ Storage::url($book->cover) }}" 
                                              class="book-cover" 
                                              alt="Cover"
                                              data-bs-toggle="modal" 
@@ -200,7 +200,7 @@
                                 <div class="action-buttons">
                                     @if($book->file_ebook)
                                         <button class="btn-action btn-action-info" 
-                                                onclick="window.open('{{ asset('storage/'.$book->file_ebook) }}', '_blank')"
+                                                onclick="window.open('{{ Storage::url(''.$book->file_ebook) }}', '_blank')"
                                                 title="Lihat PDF">
                                             <i class="fas fa-file-pdf"></i>
                                         </button>
@@ -236,7 +236,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body text-center p-4">
-                                        <img src="{{ asset('storage/'.$book->cover) }}" 
+                                        <img src="{{ Storage::url($book->cover) }}" 
                                              class="img-fluid rounded shadow-lg" 
                                              alt="Cover"
                                              style="max-height: 600px;">

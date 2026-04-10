@@ -2954,7 +2954,7 @@
 
       <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" title="{{ auth()->user()->name }}">
         @if(auth()->user()->anggota?->foto)
-          <img src="{{ asset('storage/foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}"
+          <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}"
             style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
         @else
           {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -3110,7 +3110,7 @@
           @endphp
           <div class="loan-card">
             @if($loan->ebook->cover)
-              <img src="{{ asset('storage/' . $loan->ebook->cover) }}" class="loan-cover-img">
+              <img src="{{ Storage::url($loan->ebook->cover) }}" class="loan-cover-img">
             @else
               <div class="loan-cover-ph">📚</div>
             @endif
@@ -3172,7 +3172,7 @@
           @forelse($historyLoans as $loan)
             <div class="history-item">
               @if($loan->ebook->cover)
-                <img src="{{ asset('storage/' . $loan->ebook->cover) }}" class="history-cover-img">
+                <img src="{{ Storage::url($loan->ebook->cover) }}" class="history-cover-img">
               @else
                 <div class="history-cover-ph">📖</div>
               @endif
@@ -3211,7 +3211,7 @@
             <div class="recent-card-cover"
               style="background:{{ $book->cover_color ?? 'linear-gradient(135deg,#3b82f6,#8b5cf6)' }};">
               @if($book->cover)
-                <img src="{{ asset('storage/' . $book->cover) }}" alt="{{ $book->judul_buku }}">
+                <img src="{{ Storage::url($book->cover) }}" alt="{{ $book->judul_buku }}">
               @else
                 📚
               @endif
@@ -3277,12 +3277,12 @@
             data-id="{{ $book->id_buku }}" data-judul="{{ $book->judul_buku }}" data-penulis="{{ $book->pengarang }}"
             data-sinopsis="{{ Str::limit($book->sinopsis ?? 'Deskripsi buku ini belum tersedia.', 220) }}"
             data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}"
-            data-cover="{{ $book->cover ? asset('storage/' . $book->cover) : '' }}"
+            data-cover="{{ $book->cover ? Storage::url($book->cover) : '' }}"
             data-color="{{ $book->cover_color ?? 'linear-gradient(135deg,#3b82f6,#8b5cf6)' }}"
             onclick="bukaModal(event,this)">
             <div class="book-cover-wrap">
               @if($book->cover)
-                <img src="{{ asset('storage/' . $book->cover) }}" class="book-cover-img" alt="{{ $book->judul_buku }}">
+                <img src="{{ Storage::url($book->cover) }}" class="book-cover-img" alt="{{ $book->judul_buku }}">
               @else
                 <div class="book-cover-color"
                   style="background:{{ $book->cover_color ?? 'linear-gradient(135deg,#3b82f6,#8b5cf6)' }}">

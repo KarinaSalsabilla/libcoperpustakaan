@@ -152,7 +152,7 @@
                             <label class="form-label">Cover Buku</label>
                             @if($book->cover)
                                 <div class="mb-2">
-                                    <img src="{{ asset('storage/'.$book->cover) }}"
+                                    <img src="{{ Storage::url($book->cover) }}"
                                          width="100" class="img-thumbnail">
                                 </div>
                             @endif
@@ -167,7 +167,7 @@
                             <label class="form-label">File E-Book (PDF)</label>
                             @if($book->file_ebook)
                                 <div class="mb-2">
-                                    <a href="{{ asset('storage/'.$book->file_ebook) }}"
+                                    <a href="{{ Storage::url($book->file_ebook) }}"
                                        target="_blank" class="btn btn-sm btn-info">
                                         <i class="fas fa-file-pdf"></i> Lihat PDF
                                     </a>

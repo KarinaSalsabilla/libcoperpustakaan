@@ -522,7 +522,7 @@
     </button>
     <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" title="{{ auth()->user()->name }}">
       @if(auth()->user()->anggota?->foto)
-        <img src="{{ asset('storage/foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
       @else
         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
       @endif
@@ -638,13 +638,13 @@
             data-full-judul="{{ $book->judul_buku }}" data-full-penulis="{{ $book->pengarang }}"
             data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}"
             data-sinopsis="{{ Str::limit($book->sinopsis ?? 'Deskripsi belum tersedia.', 300) }}"
-            data-cover="{{ $hasImg ? asset('storage/'.$book->cover) : '' }}"
+            data-cover="{{ $hasImg ? Storage::url($book->cover) : '' }}"
             data-color="{{ $color }}" data-tahun="{{ $book->tahun_terbit ?? '-' }}" data-isbn="{{ $book->isbn ?? '-' }}"
             data-detail-url="{{ route('anggota.buku.show', $book->id_buku) }}"
             onclick="bukaModal(event,this)">
             <div class="book-cover-wrap">
               @if($hasImg)
-                <img src="{{ asset('storage/'.$book->cover) }}" class="book-cover-img" alt="{{ $book->judul_buku }}">
+                <img src="{{ Storage::url($book->cover) }}" class="book-cover-img" alt="{{ $book->judul_buku }}">
               @else
                 <div class="book-cover-ph" style="background:{{ $color }}"><div class="book-overlay"></div><div class="book-cover-title">{{ Str::limit($book->judul_buku,30) }}</div></div>
               @endif
@@ -672,12 +672,12 @@
             data-full-judul="{{ $book->judul_buku }}" data-full-penulis="{{ $book->pengarang }}"
             data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}"
             data-sinopsis="{{ Str::limit($book->sinopsis ?? 'Deskripsi belum tersedia.', 300) }}"
-            data-cover="{{ $hasImg ? asset('storage/'.$book->cover) : '' }}"
+            data-cover="{{ $hasImg ? Storage::url($book->cover) : '' }}"
             data-color="{{ $color }}" data-tahun="{{ $book->tahun_terbit ?? '-' }}" data-isbn="{{ $book->isbn ?? '-' }}"
             data-detail-url="{{ route('anggota.buku.show', $book->id_buku) }}"
             onclick="bukaModal(event,this)">
             <div class="lc-cover" style="background:{{ $color }}">
-              @if($hasImg)<img src="{{ asset('storage/'.$book->cover) }}" alt="">@else<div class="lc-cover-ph">📚</div>@endif
+              @if($hasImg)<img src="{{ Storage::url($book->cover) }}" alt="">@else<div class="lc-cover-ph">📚</div>@endif
               <div class="lc-spine"></div>
             </div>
             <div class="lc-info">
