@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\AdminDashboardController; // ✅ TAMBAH INI
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Anggota\KoleksiController;
 use App\Http\Controllers\Admin\PengaturanController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -171,3 +173,12 @@ Route::middleware(['auth', 'admin'])
         Route::put('/buku/{id}',      [EBookController::class, 'update'])->name('buku.update');
         Route::delete('/buku/{id}',   [EBookController::class, 'destroy'])->name('buku.destroy');
     });
+
+    Route::get('/debug-disk', function () {
+    $book = DB::table('bukus')->first(); // ganti 'bukus' jika nama tabel berbeda
+    return [
+        'filesystem_disk' => config('filesystems.default'),
+        'cover_path'      => $book->cover ?? 'null',
+        'storage_url'     => $book->cover ? Storage::url($book->cover) : 'null',
+    ];
+});
