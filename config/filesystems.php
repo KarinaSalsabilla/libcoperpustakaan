@@ -37,18 +37,16 @@ return [
         ],
 
         'supabase' => [
-            'driver' => 's3',
-            'key'    => env('SUPABASE_KEY'),
-            'secret' => env('SUPABASE_SECRET'),
-            'region' => 'ap-southeast-1',
-            'bucket' => env('SUPABASE_BUCKET'),
-            'url'    => env('SUPABASE_URL'),
-            'endpoint' => env('SUPABASE_ENDPOINT'),
+            'driver'                  => 's3',
+            'key'                     => env('AWS_ACCESS_KEY_ID'),
+            'secret'                  => env('AWS_SECRET_ACCESS_KEY'),
+            'region'                  => env('AWS_DEFAULT_REGION', 'auto'),
+            'bucket'                  => env('AWS_BUCKET'),
+            'endpoint'                => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => true,
-             'throw' => true,
-              'http' => [
-        'verify' => false,
-    ],
+            'url'                     => env('SUPABASE_URL') . '/object/public/' . env('SUPABASE_BUCKET'),
+            'visibility'              => 'public',
+            'throw'                   => true,
         ],
 
     ],
