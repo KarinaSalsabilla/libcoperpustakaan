@@ -46,8 +46,13 @@ class EBookController extends Controller
         ]);
 
         $data = $request->only([
-            'judul_buku', 'pengarang', 'penerbit', 'tahun_terbit',
-            'id_kategori', 'sinopsis', 'jumlah_ebook',
+            'judul_buku',
+            'pengarang',
+            'penerbit',
+            'tahun_terbit',
+            'id_kategori',
+            'sinopsis',
+            'jumlah_ebook',
         ]);
 
         // Simpan genre sebagai string "1,2,3"
@@ -57,11 +62,11 @@ class EBookController extends Controller
         }
 
         if ($request->hasFile('cover')) {
-            $data['cover'] = $request->file('cover')->store('covers', 'public');
+            $data['cover'] = $request->file('cover')->store('covers', 'supabase');
         }
 
         if ($request->hasFile('file_ebook')) {
-            $data['file_ebook'] = $request->file('file_ebook')->store('ebooks', 'public');
+            $data['file_ebook'] = $request->file('file_ebook')->store('ebooks', 'supabase');
         }
 
         EBook::create($data);
@@ -116,13 +121,18 @@ class EBookController extends Controller
             'id_genre.*'   => 'exists:genres,id_genre',
             'sinopsis'     => 'nullable|string',
             'jumlah_ebook' => 'required|integer|min:1',
-            'cover'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'file_ebook'   => 'nullable|mimes:pdf|max:10240',
+            'cover'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',  // 5MB
+            'file_ebook' => 'nullable|mimes:pdf|max:51200',  // 50MB
         ]);
 
         $data = $request->only([
-            'judul_buku', 'pengarang', 'penerbit', 'tahun_terbit',
-            'id_kategori', 'sinopsis', 'jumlah_ebook',
+            'judul_buku',
+            'pengarang',
+            'penerbit',
+            'tahun_terbit',
+            'id_kategori',
+            'sinopsis',
+            'jumlah_ebook',
         ]);
 
         // Simpan genre sebagai string "1,2,3"
@@ -131,15 +141,10 @@ class EBookController extends Controller
             $data['id_genre'] = implode(',', array_slice($request->id_genre, 0, 3));
         }
 
-        if ($request->hasFile('cover')) {
-            if ($book->cover) Storage::disk('public')->delete($book->cover);
-            $data['cover'] = $request->file('cover')->store('covers', 'public');
-        }
-
-        if ($request->hasFile('file_ebook')) {
-            if ($book->file_ebook) Storage::disk('public')->delete($book->file_ebook);
-            $data['file_ebook'] = $request->file('file_ebook')->store('ebooks', 'public');
-        }
+        if ($book->cover) Storage::disk('supabase')->delete($book->cover);
+        $data['cover'] = $request->file('cover')->store('covers', 'supabase');
+        if ($book->file_ebook) Storage::disk('supabase')->delete($book->file_ebook);
+        $data['file_ebook'] = $request->file('file_ebook')->store('ebooks', 'supabase');
 
         $book->update($data);
 
@@ -151,8 +156,8 @@ class EBookController extends Controller
     {
         $book = EBook::findOrFail($id);
 
-        if ($book->cover)      Storage::disk('public')->delete($book->cover);
-        if ($book->file_ebook) Storage::disk('public')->delete($book->file_ebook);
+        if ($book->cover)      Storage::disk('supabase')->delete($book->cover);
+        if ($book->file_ebook) Storage::disk('supabase')->delete($book->file_ebook);
 
         $book->delete();
 
