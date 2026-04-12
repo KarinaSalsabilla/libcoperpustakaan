@@ -1374,7 +1374,15 @@
       <a href="{{ route('anggota.dashboard') }}" class="nav-link"><i class="fas fa-home"></i> Beranda</a>
       <a href="{{ route('anggota.koleksi.index') }}" class="nav-link"><i class="fas fa-book-open"></i> Koleksi</a>
       <a href="{{ route('anggota.riwayat_saya') }}" class="nav-link"><i class="fas fa-history"></i> Riwayat</a>
-      <a href="{{ route('anggota.profile.show') }}" class="nav-link active"><i class="fas fa-user"></i> Profil</a>
+      <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" id="navAvatarLink"
+        title="{{ auth()->user()->name }}">
+        @if($fotoUrl)
+          <img src="{{ $fotoUrl }}" alt="avatar" id="navAvatarImg"
+            style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        @else
+          <span id="navAvatarInitial">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+        @endif
+      </a>
     </div>
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -1420,9 +1428,9 @@
       <div class="hero-content">
         <div class="avatar-upload-wrap">
           <div class="avatar-display" onclick="triggerAvatarUpload()" title="Klik untuk mengganti foto profil">
-            @if(auth()->user()->anggota?->foto)
-              <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}"
-                id="avatarPreview">
+            @if($fotoUrl)
+              <img src="{{ $fotoUrl }}" alt="{{ auth()->user()->name }}" id="avatarPreview"
+                style="width:100%;height:100%;object-fit:cover;">
             @else
               <span class="avatar-initial" id="avatarInitialText">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}{{ strtoupper(substr(strstr(auth()->user()->name, ' ') ?: ' ', 1, 1)) }}
@@ -1829,12 +1837,12 @@
     }
 
     @if($errors->any())
-        document.addEventListener('DOMContentLoaded', () => {
-          openEditModal();
-          @if($errors->has('nohp') || $errors->has('kota') || $errors->has('jenis_kelamin') || $errors->has('agama') || $errors->has('tempat_lahir') || $errors->has('tgl_lahir'))
-            switchTab('diri');
-          @endif
-      });
+      document.addEventListener('DOMContentLoaded', () => {
+        openEditModal();
+        @if($errors->has('nohp') || $errors->has('kota') || $errors->has('jenis_kelamin') || $errors->has('agama') || $errors->has('tempat_lahir') || $errors->has('tgl_lahir'))
+          switchTab('diri');
+        @endif
+        });
     @endif
 
     document.querySelectorAll('.ach-card').forEach((card, i) => { card.style.animation = `fadeUp 0.4s ${0.3 + i * 0.07}s ease both`; });
