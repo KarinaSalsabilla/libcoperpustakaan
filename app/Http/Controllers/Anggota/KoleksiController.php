@@ -14,7 +14,7 @@ class KoleksiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = EBook::with(['kategori', 'genre'])->latest();
+        $query = EBook::with(['kategori'])->latest();
 
         if ($request->filled('q')) {
             $search = $request->q;
@@ -22,8 +22,7 @@ class KoleksiController extends Controller
                 $q->where('judul_buku', 'like', "%{$search}%")
                   ->orWhere('pengarang', 'like', "%{$search}%")
                   ->orWhere('penerbit', 'like', "%{$search}%")
-                  ->orWhereHas('kategori', fn($k) => $k->where('nama_kategori', 'like', "%{$search}%"))
-                  ->orWhereHas('genre', fn($g) => $g->where('nama_genre', 'like', "%{$search}%"));
+                  ->orWhereHas('kategori', fn($k) => $k->where('nama_kategori', 'like', "%{$search}%"));
             });
         }
 
