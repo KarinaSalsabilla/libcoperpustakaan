@@ -1,4 +1,4 @@
-{{-- resources/views/anggota/profile/index.blade.php --}}
+{{-- resources/views/anggota/profile/show.blade.php --}}
 <!DOCTYPE html>
 <html lang="id" data-theme="light">
 
@@ -1374,15 +1374,7 @@
       <a href="{{ route('anggota.dashboard') }}" class="nav-link"><i class="fas fa-home"></i> Beranda</a>
       <a href="{{ route('anggota.koleksi.index') }}" class="nav-link"><i class="fas fa-book-open"></i> Koleksi</a>
       <a href="{{ route('anggota.riwayat_saya') }}" class="nav-link"><i class="fas fa-history"></i> Riwayat</a>
-      <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" id="navAvatarLink"
-        title="{{ auth()->user()->name }}">
-        @if($fotoUrl)
-          <img src="{{ $fotoUrl }}" alt="avatar" id="navAvatarImg"
-            style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-        @else
-          <span id="navAvatarInitial">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-        @endif
-      </a>
+      <a href="{{ route('anggota.profile.show') }}" class="nav-link active"><i class="fas fa-user"></i> Profil</a>
     </div>
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -1390,10 +1382,21 @@
         <div class="toggle-thumb"><span id="toggleEmoji">☀️</span></div>
         <span class="toggle-sun">☀️</span>
       </button>
-      <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" id="navAvatarLink"
-        title="{{ auth()->user()->name }}">
-        @if(auth()->user()->anggota?->foto)
-          <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="avatar" id="navAvatarImg">
+      <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" id="navAvatarLink" title="{{ auth()->user()->name }}">
+        @php
+          use Illuminate\Support\Facades\Storage;
+          $fotoFileName = auth()->user()->anggota?->foto;
+          $fotoUrl = null;
+          if ($fotoFileName) {
+              try {
+                  $fotoUrl = Storage::disk('supabase')->url('images/foto/' . $fotoFileName);
+              } catch (\Exception $e) {
+                  $fotoUrl = null;
+              }
+          }
+        @endphp
+        @if($fotoUrl)
+          <img src="{{ $fotoUrl }}" alt="avatar" id="navAvatarImg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
         @else
           <span id="navAvatarInitial">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
         @endif
@@ -1413,11 +1416,9 @@
       <div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> {{ session('error') }}</div>
     @endif
 
-    <form id="avatarForm" action="{{ route('anggota.profile.uploadFoto') }}" method="POST" enctype="multipart/form-data"
-      style="display:none;">
+    <form id="avatarForm" action="{{ route('anggota.profile.uploadFoto') }}" method="POST" enctype="multipart/form-data" style="display:none;">
       @csrf
-      <input type="file" name="foto" id="avatarInput" accept="image/jpeg,image/png,image/webp"
-        onchange="handleAvatarChange(this)">
+      <input type="file" name="foto" id="avatarInput" accept="image/jpeg,image/png,image/webp" onchange="handleAvatarChange(this)">
     </form>
 
     <!-- PROFILE HERO -->
@@ -1428,9 +1429,19 @@
       <div class="hero-content">
         <div class="avatar-upload-wrap">
           <div class="avatar-display" onclick="triggerAvatarUpload()" title="Klik untuk mengganti foto profil">
+            @php
+              $fotoFileName = auth()->user()->anggota?->foto;
+              $fotoUrl = null;
+              if ($fotoFileName) {
+                  try {
+                      $fotoUrl = Storage::disk('supabase')->url('images/foto/' . $fotoFileName);
+                  } catch (\Exception $e) {
+                      $fotoUrl = null;
+                  }
+              }
+            @endphp
             @if($fotoUrl)
-              <img src="{{ $fotoUrl }}" alt="{{ auth()->user()->name }}" id="avatarPreview"
-                style="width:100%;height:100%;object-fit:cover;">
+              <img src="{{ $fotoUrl }}" alt="{{ auth()->user()->name }}" id="avatarPreview" style="width:100%;height:100%;object-fit:cover;">
             @else
               <span class="avatar-initial" id="avatarInitialText">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}{{ strtoupper(substr(strstr(auth()->user()->name, ' ') ?: ' ', 1, 1)) }}
@@ -1446,13 +1457,10 @@
         </div>
         <div class="hero-info">
           <div class="hero-name">{{ auth()->user()->name }}</div>
-          <div class="hero-email"><i class="far fa-envelope"
-              style="margin-right:5px;opacity:.5;"></i>{{ auth()->user()->email }}</div>
+          <div class="hero-email"><i class="far fa-envelope" style="margin-right:5px;opacity:.5;"></i>{{ auth()->user()->email }}</div>
           <div class="hero-badges">
-            <span class="hero-badge badge-role"><i class="fas fa-crown" style="font-size:.6rem;"></i>
-              {{ ucfirst(auth()->user()->role) }}</span>
-            <span class="hero-badge badge-aktif"><i class="fas fa-circle" style="font-size:.4rem;"></i> Akun
-              Aktif</span>
+            <span class="hero-badge badge-role"><i class="fas fa-crown" style="font-size:.6rem;"></i> {{ ucfirst(auth()->user()->role) }}</span>
+            <span class="hero-badge badge-aktif"><i class="fas fa-circle" style="font-size:.4rem;"></i> Akun Aktif</span>
           </div>
         </div>
         <div class="hero-actions">
@@ -1496,8 +1504,7 @@
       <div class="info-card">
         <div class="card-header">
           <div class="card-header-title"><i class="fas fa-id-card"></i> Informasi Akun</div>
-          <a href="#" class="card-link" onclick="openEditModal();return false;"><i class="fas fa-pen"
-              style="font-size:.65rem;margin-right:3px;"></i> Ubah</a>
+          <a href="#" class="card-link" onclick="openEditModal();return false;"><i class="fas fa-pen" style="font-size:.65rem;margin-right:3px;"></i> Ubah</a>
         </div>
         <div class="card-body">
           <div class="info-row">
@@ -1520,8 +1527,7 @@
               <div class="info-label">Role / Peran</div>
               <div class="info-value" style="display:flex;align-items:center;gap:8px;">
                 {{ ucfirst(auth()->user()->role) }}
-                <span
-                  style="width:6px;height:6px;border-radius:50%;background:var(--blue-500);display:inline-block;"></span>
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--blue-500);display:inline-block;"></span>
               </div>
             </div>
           </div>
@@ -1537,14 +1543,12 @@
             <div>
               <div class="info-label">Foto Profil</div>
               <div class="info-value" style="display:flex;align-items:center;gap:10px;">
-                @if(auth()->user()->anggota?->foto)
+                @if($fotoUrl)
                   <span style="color:var(--blue-600);font-size:.82rem;">📸 Sudah dipasang</span>
-                  <button onclick="triggerAvatarUpload()"
-                    style="font-size:.73rem;color:var(--blue-600);font-weight:700;background:none;border:none;cursor:pointer;padding:0;">Ganti</button>
+                  <button onclick="triggerAvatarUpload()" style="font-size:.73rem;color:var(--blue-600);font-weight:700;background:none;border:none;cursor:pointer;padding:0;">Ganti</button>
                 @else
                   <span style="color:var(--muted);font-size:.82rem;">Belum ada foto</span>
-                  <button onclick="triggerAvatarUpload()"
-                    style="font-size:.73rem;color:var(--blue-600);font-weight:700;background:none;border:none;cursor:pointer;padding:0;">Upload</button>
+                  <button onclick="triggerAvatarUpload()" style="font-size:.73rem;color:var(--blue-600);font-weight:700;background:none;border:none;cursor:pointer;padding:0;">Upload</button>
                 @endif
               </div>
             </div>
@@ -1555,8 +1559,7 @@
               <div class="info-label">Password</div>
               <div class="info-value" style="display:flex;align-items:center;gap:10px;">
                 <span style="letter-spacing:3px;font-size:.7rem;color:var(--muted);">••••••••••</span>
-                <a href="#" style="font-size:.73rem;color:var(--blue-600);font-weight:700;text-decoration:none;"
-                  onclick="openEditModal();return false;">Ganti</a>
+                <a href="#" style="font-size:.73rem;color:var(--blue-600);font-weight:700;text-decoration:none;" onclick="openEditModal();return false;">Ganti</a>
               </div>
             </div>
           </div>
@@ -1576,8 +1579,7 @@
                 <div class="act-info">
                   <div class="act-title">{{ $item->ebook->judul_buku ?? 'Judul Buku' }}</div>
                   <div class="act-author">{{ $item->ebook->pengarang ?? 'Pengarang' }}</div>
-                  <span
-                    class="act-status-pill {{ $item->status === 'aktif' ? 'pill-aktif' : ($item->status === 'terlambat' ? 'pill-terlambat' : 'pill-selesai') }}">
+                  <span class="act-status-pill {{ $item->status === 'aktif' ? 'pill-aktif' : ($item->status === 'terlambat' ? 'pill-terlambat' : 'pill-selesai') }}">
                     <span class="status-dot"></span> {{ ucfirst($item->status) }}
                   </span>
                 </div>
@@ -1588,8 +1590,7 @@
               </div>
             @empty
               <div style="padding:24px 0;text-align:center;color:var(--muted);font-size:.83rem;">
-                <i class="fas fa-book-open"
-                  style="font-size:2rem;margin-bottom:10px;display:block;opacity:.25;color:var(--blue-500);"></i>
+                <i class="fas fa-book-open" style="font-size:2rem;margin-bottom:10px;display:block;opacity:.25;color:var(--blue-500);"></i>
                 Belum ada aktivitas peminjaman
               </div>
             @endforelse
@@ -1608,16 +1609,13 @@
       </div>
       <div class="achievement-grid">
         <div class="ach-card {{ $totalPeminjaman >= 1 ? 'unlocked' : 'locked' }}">
-          <span
-            class="ach-badge {{ $totalPeminjaman >= 1 ? 'done' : 'locked' }}">{{ $totalPeminjaman >= 1 ? 'Diraih' : 'Terkunci' }}</span>
+          <span class="ach-badge {{ $totalPeminjaman >= 1 ? 'done' : 'locked' }}">{{ $totalPeminjaman >= 1 ? 'Diraih' : 'Terkunci' }}</span>
           <div class="ach-icon gold">📚</div>
           <div class="ach-name">Pembaca Pertama</div>
           <div class="ach-desc">Pinjam buku pertama kali</div>
         </div>
-        <div
-          class="ach-card {{ \Carbon\Carbon::parse(auth()->user()->created_at)->diffInMonths(now()) >= 3 ? 'unlocked' : 'locked' }}">
-          <span
-            class="ach-badge {{ \Carbon\Carbon::parse(auth()->user()->created_at)->diffInMonths(now()) >= 3 ? 'done' : 'locked' }}">
+        <div class="ach-card {{ \Carbon\Carbon::parse(auth()->user()->created_at)->diffInMonths(now()) >= 3 ? 'unlocked' : 'locked' }}">
+          <span class="ach-badge {{ \Carbon\Carbon::parse(auth()->user()->created_at)->diffInMonths(now()) >= 3 ? 'done' : 'locked' }}">
             {{ \Carbon\Carbon::parse(auth()->user()->created_at)->diffInMonths(now()) >= 3 ? 'Diraih' : 'Terkunci' }}
           </span>
           <div class="ach-icon gold">⭐</div>
@@ -1625,15 +1623,13 @@
           <div class="ach-desc">Aktif selama 3 bulan</div>
         </div>
         <div class="ach-card {{ $totalPeminjaman >= 10 ? 'unlocked' : 'locked' }}">
-          <span
-            class="ach-badge {{ $totalPeminjaman >= 10 ? 'done' : 'locked' }}">{{ $totalPeminjaman >= 10 ? 'Diraih' : 'Terkunci' }}</span>
+          <span class="ach-badge {{ $totalPeminjaman >= 10 ? 'done' : 'locked' }}">{{ $totalPeminjaman >= 10 ? 'Diraih' : 'Terkunci' }}</span>
           <div class="ach-icon bronze">🔥</div>
           <div class="ach-name">Pembaca Aktif</div>
           <div class="ach-desc">Pinjam 10 buku</div>
         </div>
         <div class="ach-card {{ $totalPeminjaman >= 50 ? 'unlocked' : 'locked' }}">
-          <span
-            class="ach-badge {{ $totalPeminjaman >= 50 ? 'done' : 'locked' }}">{{ $totalPeminjaman >= 50 ? 'Diraih' : 'Terkunci' }}</span>
+          <span class="ach-badge {{ $totalPeminjaman >= 50 ? 'done' : 'locked' }}">{{ $totalPeminjaman >= 50 ? 'Diraih' : 'Terkunci' }}</span>
           <div class="ach-icon gray">🏆</div>
           <div class="ach-name">Kutu Buku</div>
           <div class="ach-desc">
@@ -1646,7 +1642,6 @@
   </div>
 
   <!-- EDIT MODAL -->
-  <!-- EDIT MODAL -->
   <div class="modal-overlay" id="editModalOverlay">
     <div class="modal-box" style="max-width:560px;">
       <div class="modal-strip"></div>
@@ -1656,14 +1651,10 @@
 
         {{-- TAB SWITCHER --}}
         <div style="display:flex;gap:4px;margin-bottom:22px;background:var(--cream2);border-radius:12px;padding:4px;">
-          <button type="button" id="tabBtnAkun" onclick="switchTab('akun')"
-            style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:.8rem;font-weight:700;
-                 background:var(--grad-btn);color:white;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;">
+          <button type="button" id="tabBtnAkun" onclick="switchTab('akun')" style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:.8rem;font-weight:700;background:var(--grad-btn);color:white;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;">
             <i class="fas fa-lock" style="margin-right:5px;font-size:.7rem;"></i>Data Akun
           </button>
-          <button type="button" id="tabBtnDiri" onclick="switchTab('diri')"
-            style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:.8rem;font-weight:700;
-                 background:transparent;color:var(--muted);transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;">
+          <button type="button" id="tabBtnDiri" onclick="switchTab('diri')" style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:.8rem;font-weight:700;background:transparent;color:var(--muted);transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;">
             <i class="fas fa-id-card" style="margin-right:5px;font-size:.7rem;"></i>Data Diri
           </button>
         </div>
@@ -1675,20 +1666,16 @@
           <div id="panelAkun">
             <div class="form-group">
               <label class="form-label">Nama Lengkap</label>
-              <input type="text" name="name" class="form-input" value="{{ old('name', auth()->user()->name) }}"
-                required>
+              <input type="text" name="name" class="form-input" value="{{ old('name', auth()->user()->name) }}" required>
             </div>
             <div class="form-group">
               <label class="form-label">Alamat Email</label>
-              <input type="email" name="email" class="form-input" value="{{ old('email', auth()->user()->email) }}"
-                required>
+              <input type="email" name="email" class="form-input" value="{{ old('email', auth()->user()->email) }}" required>
             </div>
             <div class="form-group">
               <label class="form-label">
                 Password Baru
-                <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">
-                  (kosongkan jika tidak ingin mengubah)
-                </span>
+                <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(kosongkan jika tidak ingin mengubah)</span>
               </label>
               <input type="password" name="password" class="form-input" placeholder="••••••••">
             </div>
@@ -1703,13 +1690,11 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label">No HP</label>
-                <input type="text" name="nohp" class="form-input"
-                  value="{{ old('nohp', auth()->user()->anggota?->nohp) }}" placeholder="08xxxxxxxxxx">
+                <input type="text" name="nohp" class="form-input" value="{{ old('nohp', auth()->user()->anggota?->nohp) }}" placeholder="08xxxxxxxxxx">
               </div>
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label">Kota</label>
-                <input type="text" name="kota" class="form-input"
-                  value="{{ old('kota', auth()->user()->anggota?->kota) }}" placeholder="Kota domisili">
+                <input type="text" name="kota" class="form-input" value="{{ old('kota', auth()->user()->anggota?->kota) }}" placeholder="Kota domisili">
               </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
@@ -1726,9 +1711,7 @@
                 <select name="agama" class="form-input">
                   <option value="">-- Pilih --</option>
                   @foreach(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'] as $ag)
-                    <option value="{{ $ag }}" {{ old('agama', auth()->user()->anggota?->agama) == $ag ? 'selected' : '' }}>
-                      {{ $ag }}
-                    </option>
+                    <option value="{{ $ag }}" {{ old('agama', auth()->user()->anggota?->agama) == $ag ? 'selected' : '' }}>{{ $ag }}</option>
                   @endforeach
                 </select>
               </div>
@@ -1736,28 +1719,24 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label">Tempat Lahir</label>
-                <input type="text" name="tempat_lahir" class="form-input"
-                  value="{{ old('tempat_lahir', auth()->user()->anggota?->tempat_lahir) }}"
-                  placeholder="Kota kelahiran">
+                <input type="text" name="tempat_lahir" class="form-input" value="{{ old('tempat_lahir', auth()->user()->anggota?->tempat_lahir) }}" placeholder="Kota kelahiran">
               </div>
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label">Tanggal Lahir</label>
-                <input type="date" name="tgl_lahir" class="form-input"
-                  value="{{ old('tgl_lahir', auth()->user()->anggota?->tgl_lahir) }}">
+                <input type="date" name="tgl_lahir" class="form-input" value="{{ old('tgl_lahir', auth()->user()->anggota?->tgl_lahir) }}">
               </div>
             </div>
           </div>
 
           <div class="form-btns" style="margin-top:22px;">
             <button type="button" class="btn-form-outline" onclick="closeEditModal()">Batal</button>
-            <button type="submit" class="btn-form-fill">
-              <i class="fas fa-save"></i> Simpan Perubahan
-            </button>
+            <button type="submit" class="btn-form-fill"><i class="fas fa-save"></i> Simpan Perubahan</button>
           </div>
         </form>
       </div>
     </div>
   </div>
+
   <script>
     /* THEME */
     const html = document.documentElement,
@@ -1793,56 +1772,93 @@
 
     /* AVATAR */
     function triggerAvatarUpload() { document.getElementById('avatarInput').click(); }
+    
     function handleAvatarChange(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
       if (file.size > 2 * 1024 * 1024) { showToast('Ukuran foto maksimal 2MB!', true); return; }
+      
+      // Preview lokal dulu
       const reader = new FileReader();
-      reader.onload = e => updateAvatarUI(e.target.result);
+      reader.onload = function(e) { updateAvatarUI(e.target.result); };
       reader.readAsDataURL(file);
+      
+      // Upload ke server
       const fd = new FormData();
       fd.append('_token', '{{ csrf_token() }}');
       fd.append('foto', file);
+      
       fetch('{{ route("anggota.profile.uploadFoto") }}', { method: 'POST', body: fd })
-        .then(r => r.json())
+        .then(response => response.json())
         .then(data => {
-          if (data.success) { updateAvatarUI(data.url); showToast('Foto profil berhasil diperbarui! 🎉', false); }
-          else showToast(data.message || 'Gagal mengunggah foto.', true);
+          if (data.success) { 
+            updateAvatarUI(data.url); 
+            showToast('Foto profil berhasil diperbarui! 🎉', false);
+            // Refresh page after 1.5 seconds to ensure all data is updated
+            setTimeout(() => location.reload(), 1500);
+          } else { 
+            showToast(data.message || 'Gagal mengunggah foto.', true);
+            location.reload();
+          }
         })
-        .catch(() => showToast('Terjadi kesalahan. Coba lagi.', true));
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Terjadi kesalahan. Coba lagi.', true);
+          location.reload();
+        });
     }
+    
     function updateAvatarUI(src) {
-      const preview = document.getElementById('avatarPreview'), initialText = document.getElementById('avatarInitialText');
-      if (preview) { preview.src = src; preview.style.display = 'block'; }
+      // Update hero avatar
+      const preview = document.getElementById('avatarPreview');
+      const initialText = document.getElementById('avatarInitialText');
+      if (preview) { 
+        preview.src = src; 
+        preview.style.display = 'block'; 
+      }
       if (initialText) initialText.style.display = 'none';
+      
+      // Update navbar avatar
       const navInitial = document.getElementById('navAvatarInitial');
       let navImg = document.getElementById('navAvatarImg');
       const navLink = document.getElementById('navAvatarLink');
+      
       if (navInitial) navInitial.style.display = 'none';
-      if (navImg) { navImg.src = src; }
-      else if (navLink) {
+      if (navImg) { 
+        navImg.src = src; 
+      } else if (navLink) {
         navImg = document.createElement('img');
-        navImg.id = 'navAvatarImg'; navImg.alt = 'avatar';
+        navImg.id = 'navAvatarImg';
+        navImg.alt = 'avatar';
         navImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-        navImg.src = src; navLink.appendChild(navImg);
+        navImg.src = src;
+        navLink.appendChild(navImg);
       }
     }
+    
     function showToast(msg, isError) {
-      const toast = document.getElementById('photoToast'), msgEl = document.getElementById('photoToastMsg'), icon = toast.querySelector('i');
+      const toast = document.getElementById('photoToast'), 
+            msgEl = document.getElementById('photoToastMsg'), 
+            icon = toast.querySelector('i');
       msgEl.textContent = msg;
-      if (isError) { toast.classList.add('error'); icon.className = 'fas fa-exclamation-circle'; }
-      else { toast.classList.remove('error'); icon.className = 'fas fa-check-circle'; }
+      if (isError) { 
+        toast.classList.add('error'); 
+        icon.className = 'fas fa-exclamation-circle'; 
+      } else { 
+        toast.classList.remove('error'); 
+        icon.className = 'fas fa-check-circle'; 
+      }
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
     @if($errors->any())
-      document.addEventListener('DOMContentLoaded', () => {
-        openEditModal();
-        @if($errors->has('nohp') || $errors->has('kota') || $errors->has('jenis_kelamin') || $errors->has('agama') || $errors->has('tempat_lahir') || $errors->has('tgl_lahir'))
-          switchTab('diri');
-        @endif
-        });
+        document.addEventListener('DOMContentLoaded', () => {
+          openEditModal();
+          @if($errors->has('nohp') || $errors->has('kota') || $errors->has('jenis_kelamin') || $errors->has('agama') || $errors->has('tempat_lahir') || $errors->has('tgl_lahir'))
+            switchTab('diri');
+          @endif
+      });
     @endif
 
     document.querySelectorAll('.ach-card').forEach((card, i) => { card.style.animation = `fadeUp 0.4s ${0.3 + i * 0.07}s ease both`; });
