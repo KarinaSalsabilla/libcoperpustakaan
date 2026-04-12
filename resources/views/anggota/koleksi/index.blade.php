@@ -47,7 +47,8 @@
     .theme-toggle{width:56px;height:30px;border-radius:50px;background:var(--blue-50);border:1.5px solid var(--border);position:relative;cursor:pointer;display:flex;align-items:center;padding:2px}
     .toggle-thumb{width:24px;height:24px;border-radius:50%;background:var(--grad-btn);display:flex;align-items:center;justify-content:center;transition:transform .38s}
     [data-theme="dark"] .toggle-thumb{transform:translateX(26px)}
-    .nav-avatar{width:36px;height:36px;border-radius:50%;background:var(--grad-btn);color:white;display:flex;align-items:center;justify-content:center;text-decoration:none}
+    .nav-avatar{width:36px;height:36px;border-radius:50%;background:var(--grad-btn);color:white;display:flex;align-items:center;justify-content:center;text-decoration:none;overflow:hidden}
+    .nav-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
     .page{max-width:1320px;margin:0 auto;padding:28px 32px 80px}
     .flash{display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:12px;margin-bottom:18px}
     .flash-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#15803d}
@@ -121,7 +122,25 @@
   </div>
   <div class="nav-right">
     <button class="theme-toggle" id="themeToggle"><div class="toggle-thumb">🌙</div></button>
-    <a href="{{ route('anggota.profile.show') }}" class="nav-avatar">{{ strtoupper(substr(auth()->user()->name,0,1)) }}</a>
+    <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" id="navAvatarLink">
+      @php
+        use Illuminate\Support\Facades\Storage;
+        $fotoFileName = auth()->user()->anggota?->foto;
+        $fotoUrl = null;
+        if ($fotoFileName) {
+            try {
+                $fotoUrl = Storage::disk('supabase')->url('images/foto/' . $fotoFileName);
+            } catch (\Exception $e) {
+                $fotoUrl = null;
+            }
+        }
+      @endphp
+      @if($fotoUrl)
+        <img src="{{ $fotoUrl }}" alt="avatar" id="navAvatarImg">
+      @else
+        <span id="navAvatarInitial">{{ strtoupper(substr(auth()->user()->name,0,1)) }}</span>
+      @endif
+    </a>
     <form method="POST" action="/logout" style="display:inline;">@csrf<button type="submit" style="background:none;border:none;color:var(--muted);cursor:pointer"><i class="fas fa-sign-out-alt"></i></button></form>
   </div>
 </nav>
