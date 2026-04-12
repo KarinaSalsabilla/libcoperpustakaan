@@ -241,13 +241,46 @@
 
     .book-card{text-decoration:none;color:inherit;display:block;cursor:pointer;animation:fadeUp .4s ease both}
 
-    .book-cover-wrap{
-      position:relative;width:100%;padding-bottom:150%;
-      border-radius:4px 12px 12px 4px;overflow:hidden;
-      box-shadow:-3px 5px 18px rgba(37,99,235,.15);
-      transition:transform .32s cubic-bezier(.34,1.2,.64,1),box-shadow .32s;
-      margin-bottom:10px;background:#c7d2fe;
-    }
+    .book-cover-wrap {
+  position: relative;
+  width: 100%;
+  padding-bottom: 150%;
+  border-radius: 4px 12px 12px 4px;
+  overflow: hidden;
+  box-shadow: -3px 5px 18px rgba(37,99,235,.15);
+  transition: transform .32s cubic-bezier(.34,1.2,.64,1), box-shadow .32s;
+  margin-bottom: 10px;
+  background: #c7d2fe;
+}
+
+.book-cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+}
+
+.book-spine {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 8px;
+  background: rgba(0,0,0,.22);
+  z-index: 2;
+  border-radius: 4px 0 0 4px;
+}
+
+.avail-dot {
+  position: absolute;
+  top: 8px; right: 8px;
+  z-index: 4;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.8);
+  box-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
     .book-card:hover .book-cover-wrap{
       transform:perspective(600px) rotateY(-8deg) translateY(-7px) scale(1.02);
       box-shadow:6px 16px 32px rgba(37,99,235,.22);
