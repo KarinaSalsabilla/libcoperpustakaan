@@ -142,7 +142,6 @@
     .book-grid.list-view{grid-template-columns:1fr;gap:8px}
     .book-card{text-decoration:none;color:inherit;display:block;cursor:pointer;animation:fadeUp .4s ease both}
 
-    /* COVER — aspect-ratio modern, reliable di semua browser */
     .book-cover-wrap{
       position:relative;width:100%;aspect-ratio:2/3;
       border-radius:4px 12px 12px 4px;overflow:hidden;
@@ -377,53 +376,33 @@
   </div>
 
   <!-- BOOK GRID -->
-  {{-- Setiap buku dibungkus .book-pair supaya JS bisa ambil grid+list tanpa salah sibling --}}
+  @php
+    $colors = [
+      'linear-gradient(135deg,#1d4ed8,#7c3aed)',
+      'linear-gradient(135deg,#0f766e,#0891b2)',
+      'linear-gradient(135deg,#b45309,#d97706)',
+      'linear-gradient(135deg,#9333ea,#ec4899)',
+      'linear-gradient(135deg,#047857,#059669)',
+      'linear-gradient(135deg,#dc2626,#ea580c)',
+      'linear-gradient(135deg,#1e40af,#0369a1)',
+      'linear-gradient(135deg,#7e22ce,#a21caf)',
+    ];
+  @endphp
+
   <div class="book-grid" id="bookGrid">
     @forelse($ebooks as $book)
       @php
-        $stok = $book->jumlah_ebook ?? 0;
-    $hasImg = !empty($book->cover);
-    // Konversi path ke full Supabase public URL
-    $coverUrl = $hasImg
-        ? Storage::disk('supabase')->url($book->cover)
-        : '';
-        $colors = [
-          'linear-gradient(135deg,#1d4ed8,#7c3aed)',
-          'linear-gradient(135deg,#0f766e,#0891b2)',
-          'linear-gradient(135deg,#b45309,#d97706)',
-          'linear-gradient(135deg,#9333ea,#ec4899)',
-          'linear-gradient(135deg,#047857,#059669)',
-          'linear-gradient(135deg,#dc2626,#ea580c)',
-          'linear-gradient(135deg,#1e40af,#0369a1)',
-          'linear-gradient(135deg,#7e22ce,#a21caf)',
-        ];
-        $color = $colors[$book->id_buku % count($colors)];
+        $stok     = $book->jumlah_ebook ?? 0;
+        $hasImg   = !empty($book->cover);
+        $coverUrl = $hasImg ? Storage::disk('supabase')->url($book->cover) : '';
+        $color    = $colors[$book->id_buku % count($colors)];
       @endphp
 
-      {{-- GRID CARD --}}
-      <a href="#" class="book-card grid-item"
-        data-id="{{ $book->id_buku }}"
-        data-cat="{{ $book->id_kategori }}"
-        data-stok="{{ $stok }}"
-        data-judul="{{ strtolower($book->judul_buku) }}"
-        data-penulis="{{ strtolower($book->pengarang) }}"
-        data-full-judul="{{ $book->judul_buku }}"
-        data-full-penulis="{{ $book->pengarang }}"
-        data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}"
-        data-sinopsis="{{ Str::limit($book->sinopsis ?? 'Deskripsi belum tersedia.', 300) }}"
-        data-cover="{{ $coverUrl }}"
-        data-color="{{ $color }}"
-        data-tahun="{{ $book->tahun_terbit ?? '-' }}"
-        data-isbn="{{ $book->isbn ?? '-' }}"
-        data-detail-url="{{ route('anggota.buku.show', $book->id_buku) }}"
-        onclick="bukaModal(event,this)">
+      {{-- GRID CARD — hanya data-id, semua data lain dari JSON --}}
+      <a href="#" class="book-card grid-item" data-id="{{ $book->id_buku }}" onclick="bukaModal(event,this)">
         <div class="book-cover-wrap">
           @if($hasImg)
-            <img src="{{ $coverUrl }}"
-                 class="book-cover-img"
-                 alt="{{ $book->judul_buku }}"
-                 referrerpolicy="no-referrer"
-                 loading="lazy">
+            <img src="{{ $coverUrl }}" class="book-cover-img" alt="{{ $book->judul_buku }}" referrerpolicy="no-referrer" loading="lazy">
           @else
             <div class="book-cover-ph" style="background:{{ $color }};"></div>
             <div class="book-cover-title">{{ Str::limit($book->judul_buku, 32) }}</div>
@@ -450,23 +429,8 @@
         </div>
       </a>
 
-      {{-- LIST CARD --}}
-      <a href="#" class="list-card list-item" style="display:none;"
-        data-id="{{ $book->id_buku }}"
-        data-cat="{{ $book->id_kategori }}"
-        data-stok="{{ $stok }}"
-        data-judul="{{ strtolower($book->judul_buku) }}"
-        data-penulis="{{ strtolower($book->pengarang) }}"
-        data-full-judul="{{ $book->judul_buku }}"
-        data-full-penulis="{{ $book->pengarang }}"
-        data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}"
-        data-sinopsis="{{ Str::limit($book->sinopsis ?? 'Deskripsi belum tersedia.', 300) }}"
-        data-cover="{{ $coverUrl }}"
-        data-color="{{ $color }}"
-        data-tahun="{{ $book->tahun_terbit ?? '-' }}"
-        data-isbn="{{ $book->isbn ?? '-' }}"
-        data-detail-url="{{ route('anggota.buku.show', $book->id_buku) }}"
-        onclick="bukaModal(event,this)">
+      {{-- LIST CARD — hanya data-id --}}
+      <a href="#" class="list-card list-item" style="display:none;" data-id="{{ $book->id_buku }}" onclick="bukaModal(event,this)">
         <div class="lc-cover" style="background:{{ $color }}">
           @if($hasImg)
             <img src="{{ $coverUrl }}" alt="{{ $book->judul_buku }}" referrerpolicy="no-referrer" loading="lazy">
@@ -550,146 +514,210 @@
   </div>
 </div>
 
-<script>
-/* THEME */
-const html=document.documentElement,themeFlash=document.getElementById('themeFlash'),toggleEmoji=document.getElementById('toggleEmoji');
-(function(){const t=localStorage.getItem('libco-theme')||'light';html.setAttribute('data-theme',t);toggleEmoji.textContent=t==='dark'?'🌙':'☀️';})();
-document.getElementById('themeToggle').addEventListener('click',()=>{
-  const isDark=html.getAttribute('data-theme')==='dark',next=isDark?'light':'dark';
-  themeFlash.classList.add('active');setTimeout(()=>themeFlash.classList.remove('active'),300);
-  html.setAttribute('data-theme',next);toggleEmoji.textContent=next==='dark'?'🌙':'☀️';
-  localStorage.setItem('libco-theme',next);
-});
-
-/* FILTER ENGINE
-   Pasangkan grid card + list card via data-id supaya tidak bergantung pada sibling order */
-let isGrid=true,activeSearch='',activeCat='semua',activeAvail='semua';
-
-const gridCards={},listCards={};
-document.querySelectorAll('.book-card.grid-item').forEach(el=>{ gridCards[el.dataset.id]=el; });
-document.querySelectorAll('.list-card.list-item').forEach(el=>{ listCards[el.dataset.id]=el; });
-
-const allBooks=Object.keys(gridCards).map(id=>({
-  id,
-  g:gridCards[id],
-  l:listCards[id]||null,
-  cat:gridCards[id].dataset.cat,
-  stok:parseInt(gridCards[id].dataset.stok)||0,
-  judul:gridCards[id].dataset.judul,
-  penulis:gridCards[id].dataset.penulis,
-}));
-
-function applyFilters(){
-  let vis=0;
-  allBooks.forEach(b=>{
-    // Gunakan == (bukan ===) agar string & number cocok
-    const catMatch   = activeCat==='semua' || b.cat == activeCat;
-    const searchMatch= !activeSearch||b.judul.includes(activeSearch)||b.penulis.includes(activeSearch);
-    const availMatch = activeAvail==='semua'||(activeAvail==='tersedia'&&b.stok>0)||(activeAvail==='habis'&&b.stok===0);
-    const show=catMatch&&searchMatch&&availMatch;
-    b.g.style.display=(isGrid&&show)?'':'none';
-    if(b.l) b.l.style.display=(!isGrid&&show)?'':'none';
-    if(show) vis++;
+{{-- ── DATA BUKU KE JSON (aman dari karakter spesial apapun) ── --}}
+@php
+  $booksJson = $ebooks->map(function($book) use ($colors) {
+    $stok     = $book->jumlah_ebook ?? 0;
+    $color    = $colors[$book->id_buku % count($colors)];
+    $coverUrl = !empty($book->cover)
+      ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($book->cover)
+      : '';
+    return [
+      'id'          => (string) $book->id_buku,
+      'cat'         => (string) $book->id_kategori,
+      'stok'        => (int) $stok,
+      'judul'       => strtolower($book->judul_buku),
+      'penulis'     => strtolower($book->pengarang),
+      'fullJudul'   => $book->judul_buku,
+      'fullPenulis' => $book->pengarang,
+      'kategori'    => $book->kategori->nama_kategori ?? '-',
+      'sinopsis'    => \Illuminate\Support\Str::limit($book->sinopsis ?? 'Deskripsi belum tersedia.', 300),
+      'cover'       => $coverUrl,
+      'color'       => $color,
+      'tahun'       => (string) ($book->tahun_terbit ?? '-'),
+      'isbn'        => (string) ($book->isbn ?? '-'),
+      'detailUrl'   => route('anggota.buku.show', $book->id_buku),
+    ];
   });
-/* CATEGORY CHIPS */
-document.querySelectorAll('.cat-chip').forEach(btn=>btn.addEventListener('click',()=>{
-  document.querySelectorAll('.cat-chip').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');activeCat=btn.dataset.cat;applyFilters();
-}));
+@endphp
 
-/* AVAILABILITY CHIPS */
-document.querySelectorAll('.avail-chip').forEach(btn=>btn.addEventListener('click',()=>{
-  document.querySelectorAll('.avail-chip').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');activeAvail=btn.dataset.avail;applyFilters();
-}));
+<script>
+/* ── DATA BUKU (100% aman, tidak akan crash karena karakter spesial) ── */
+const BOOKS = @json($booksJson);
+const BOOKS_MAP = {};
+BOOKS.forEach(b => BOOKS_MAP[b.id] = b);
 
-/* SEARCH */
-let debounce;
-document.getElementById('navSearch').addEventListener('input',function(){
-  clearTimeout(debounce);debounce=setTimeout(()=>{activeSearch=this.value.trim().toLowerCase();applyFilters();},150);
+/* ── THEME ── */
+const html        = document.documentElement;
+const themeFlash  = document.getElementById('themeFlash');
+const toggleEmoji = document.getElementById('toggleEmoji');
+
+(function () {
+  const t = localStorage.getItem('libco-theme') || 'light';
+  html.setAttribute('data-theme', t);
+  toggleEmoji.textContent = t === 'dark' ? '🌙' : '☀️';
+})();
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const next   = isDark ? 'light' : 'dark';
+  themeFlash.classList.add('active');
+  setTimeout(() => themeFlash.classList.remove('active'), 300);
+  html.setAttribute('data-theme', next);
+  toggleEmoji.textContent = next === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('libco-theme', next);
 });
 
-/* RESET */
-document.getElementById('resetBtn').addEventListener('click',()=>{
-  activeCat='semua';activeAvail='semua';activeSearch='';
-  document.getElementById('navSearch').value='';
-  document.querySelectorAll('.cat-chip').forEach(b=>b.classList.remove('active'));
+/* ── FILTER ENGINE ── */
+let isGrid = true, activeSearch = '', activeCat = 'semua', activeAvail = 'semua';
+
+const gridCards = {}, listCards = {};
+document.querySelectorAll('.book-card.grid-item').forEach(el => { gridCards[el.dataset.id] = el; });
+document.querySelectorAll('.list-card.list-item').forEach(el  => { listCards[el.dataset.id] = el; });
+
+/* Gabungkan data JSON dengan elemen DOM */
+const allBooks = BOOKS.map(b => ({
+  ...b,
+  g: gridCards[b.id],
+  l: listCards[b.id] || null,
+})).filter(b => b.g);
+
+function applyFilters() {
+  let vis = 0;
+  allBooks.forEach(b => {
+    /* == bukan === supaya "1" == 1 (string dari data-cat vs number dari PHP) */
+    const catMatch    = activeCat === 'semua' || b.cat == activeCat;
+    const searchMatch = !activeSearch
+                      || b.judul.includes(activeSearch)
+                      || b.penulis.includes(activeSearch);
+    const availMatch  = activeAvail === 'semua'
+                      || (activeAvail === 'tersedia' && b.stok > 0)
+                      || (activeAvail === 'habis'    && b.stok === 0);
+    const show = catMatch && searchMatch && availMatch;
+    if (b.g) b.g.style.display = (isGrid  && show) ? '' : 'none';
+    if (b.l) b.l.style.display = (!isGrid && show) ? '' : 'none';
+    if (show) vis++;
+  });
+  document.getElementById('resultInfo').innerHTML =
+    `Menampilkan <strong>${vis}</strong> dari ${allBooks.length} buku`;
+  const emptyEl = document.getElementById('emptyState');
+  emptyEl.classList.toggle('show', vis === 0);
+  document.getElementById('emptyText').textContent = activeSearch
+    ? `Tidak ada buku untuk "${activeSearch}".`
+    : 'Tidak ada buku pada filter ini.';
+}
+
+/* ── CATEGORY CHIPS ── */
+document.querySelectorAll('.cat-chip').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.cat;
+  applyFilters();
+}));
+
+/* ── AVAILABILITY CHIPS ── */
+document.querySelectorAll('.avail-chip').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.avail-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeAvail = btn.dataset.avail;
+  applyFilters();
+}));
+
+/* ── SEARCH ── */
+let debounceTimer;
+document.getElementById('navSearch').addEventListener('input', function () {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    activeSearch = this.value.trim().toLowerCase();
+    applyFilters();
+  }, 150);
+});
+
+/* ── RESET ── */
+document.getElementById('resetBtn').addEventListener('click', () => {
+  activeCat = 'semua'; activeAvail = 'semua'; activeSearch = '';
+  document.getElementById('navSearch').value = '';
+  document.querySelectorAll('.cat-chip').forEach(b  => b.classList.remove('active'));
   document.querySelector('.cat-chip[data-cat="semua"]').classList.add('active');
-  document.querySelectorAll('.avail-chip').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.avail-chip').forEach(b => b.classList.remove('active'));
   document.querySelector('.avail-chip[data-avail="semua"]').classList.add('active');
   applyFilters();
 });
 
-/* VIEW TOGGLE */
-document.getElementById('btnGrid').addEventListener('click',()=>{
-  isGrid=true;
+/* ── VIEW TOGGLE ── */
+document.getElementById('btnGrid').addEventListener('click', () => {
+  isGrid = true;
   document.getElementById('btnGrid').classList.add('active');
   document.getElementById('btnList').classList.remove('active');
   document.getElementById('bookGrid').classList.remove('list-view');
   applyFilters();
 });
-document.getElementById('btnList').addEventListener('click',()=>{
-  isGrid=false;
+document.getElementById('btnList').addEventListener('click', () => {
+  isGrid = false;
   document.getElementById('btnList').classList.add('active');
   document.getElementById('btnGrid').classList.remove('active');
   document.getElementById('bookGrid').classList.add('list-view');
   applyFilters();
 });
 
-/* SORT */
-document.getElementById('sortSelect').addEventListener('change',function(){
-  const grid=document.getElementById('bookGrid'),emptyEl=document.getElementById('emptyState');
-  const pairs=[...allBooks];
-  pairs.sort((a,b)=>{
-    if(this.value==='az') return a.judul.localeCompare(b.judul);
-    if(this.value==='za') return b.judul.localeCompare(a.judul);
-    if(this.value==='stok') return b.stok-a.stok;
+/* ── SORT ── */
+document.getElementById('sortSelect').addEventListener('change', function () {
+  const grid    = document.getElementById('bookGrid');
+  const emptyEl = document.getElementById('emptyState');
+  const sorted  = [...allBooks];
+  sorted.sort((a, b) => {
+    if (this.value === 'az')   return a.judul.localeCompare(b.judul);
+    if (this.value === 'za')   return b.judul.localeCompare(a.judul);
+    if (this.value === 'stok') return b.stok - a.stok;
     return 0;
   });
-  pairs.forEach(p=>{grid.insertBefore(p.g,emptyEl);if(p.l)grid.insertBefore(p.l,emptyEl);});
+  sorted.forEach(p => {
+    if (p.g) grid.insertBefore(p.g, emptyEl);
+    if (p.l) grid.insertBefore(p.l, emptyEl);
+  });
 });
 
-/* MODAL */
-function bukaModal(e,el){
+/* ── MODAL ── */
+function bukaModal(e, el) {
   e.preventDefault();
-  const stok=parseInt(el.dataset.stok)||0,
-        cover=el.dataset.cover,
-        color=el.dataset.color||'linear-gradient(135deg,#1d4ed8,#7c3aed)',
-        judul=el.dataset.fullJudul||'—',
-        penulis=el.dataset.fullPenulis||'—',
-        detailUrl=el.dataset.detailUrl||'#';
+  const b = BOOKS_MAP[el.dataset.id];
+  if (!b) return;
 
-  const mc=document.getElementById('mCover');
-  mc.style.background=color;
-  mc.innerHTML=cover
-    ?`<div class="modal-cover-spine"></div><img src="${cover}" alt="${judul}" referrerpolicy="no-referrer">`
-    :`<div class="modal-cover-spine"></div><div class="modal-cover-ph">📚</div>`;
+  const mc = document.getElementById('mCover');
+  mc.style.background = b.color;
+  mc.innerHTML = b.cover
+    ? `<div class="modal-cover-spine"></div><img src="${b.cover}" alt="" referrerpolicy="no-referrer">`
+    : `<div class="modal-cover-spine"></div><div class="modal-cover-ph">📚</div>`;
 
-  const ma=document.getElementById('mAvail');
-  ma.className='modal-avail '+(stok>0?'ok':'none');
-  ma.textContent=stok>0?`${stok} eksemplar tersedia`:'Stok habis';
+  const ma = document.getElementById('mAvail');
+  ma.className   = 'modal-avail ' + (b.stok > 0 ? 'ok' : 'none');
+  ma.textContent = b.stok > 0 ? `${b.stok} eksemplar tersedia` : 'Stok habis';
 
-  document.getElementById('mKat').textContent=el.dataset.kategori||'—';
-  document.getElementById('mJudul').textContent=judul;
-  document.getElementById('mPenulis').innerHTML=`oleh <span>${penulis}</span>`;
-  document.getElementById('mSinopsis').textContent=el.dataset.sinopsis||'Deskripsi belum tersedia.';
-  document.getElementById('mTahun').textContent=el.dataset.tahun||'—';
-  document.getElementById('mIsbn').textContent=el.dataset.isbn||'—';
-  document.getElementById('mBtns').innerHTML=
-    `<a href="${detailUrl}" class="modal-btn mb-outline"><i class="fas fa-eye"></i> Selengkapnya</a>`+
-    (stok>0
-      ?`<a href="${detailUrl}" class="modal-btn mb-fill"><i class="fas fa-book-open"></i> Pinjam Buku</a>`
-      :`<span class="modal-btn mb-disabled"><i class="fas fa-times"></i> Stok Habis</span>`);
+  document.getElementById('mKat').textContent      = b.kategori;
+  document.getElementById('mJudul').textContent    = b.fullJudul;
+  document.getElementById('mPenulis').innerHTML    = `oleh <span>${b.fullPenulis}</span>`;
+  document.getElementById('mSinopsis').textContent = b.sinopsis;
+  document.getElementById('mTahun').textContent    = b.tahun;
+  document.getElementById('mIsbn').textContent     = b.isbn;
+  document.getElementById('mBtns').innerHTML =
+    `<a href="${b.detailUrl}" class="modal-btn mb-outline"><i class="fas fa-eye"></i> Selengkapnya</a>` +
+    (b.stok > 0
+      ? `<a href="${b.detailUrl}" class="modal-btn mb-fill"><i class="fas fa-book-open"></i> Pinjam Buku</a>`
+      : `<span class="modal-btn mb-disabled"><i class="fas fa-times"></i> Stok Habis</span>`);
 
   document.getElementById('modalOverlay').classList.add('show');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
-function tutupModal(){
+
+function tutupModal() {
   document.getElementById('modalOverlay').classList.remove('show');
-  document.body.style.overflow='';
+  document.body.style.overflow = '';
 }
-document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)tutupModal();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')tutupModal();});
+
+document.getElementById('modalOverlay').addEventListener('click', function (e) {
+  if (e.target === this) tutupModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') tutupModal(); });
 </script>
 </body>
 </html>
