@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Anggota;
 
 use App\Http\Controllers\Controller;
-use App\Models\Ebook;
+use App\Models\EBook;
 use App\Models\Kategori;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ class KoleksiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Ebook::with(['kategori', 'genre'])->latest();
+        $query = EBook::with(['kategori', 'genre'])->latest();
 
         if ($request->filled('q')) {
             $search = $request->q;
@@ -42,7 +42,7 @@ class KoleksiController extends Controller
         return view('anggota.koleksi.index', compact('ebooks', 'kategoris', 'sedangDipinjam'));
     }
 
-    public function pinjam(Request $request, Ebook $ebook)
+    public function pinjam(Request $request, EBook $ebook)
     {
         $userId = Auth::id();
 
