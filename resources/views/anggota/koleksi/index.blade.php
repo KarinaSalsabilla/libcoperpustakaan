@@ -170,9 +170,10 @@
       $stok = $book->jumlah_ebook ?? 0; 
       $coverUrl = !empty($book->cover) ? Storage::disk('supabase')->url($book->cover) : ''; 
       $color = $colors[$index % count($colors)];
+      $sinopsisSingkat = Str::limit($book->sinopsis ?? 'Tidak ada sinopsis untuk buku ini.', 300);
     @endphp
     
-    <div class="book-card" data-id="{{ $book->id_buku }}" data-judul="{{ strtolower($book->judul_buku) }}" data-penulis="{{ strtolower($book->pengarang) }}" data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}" data-stok="{{ $stok }}" onclick="bukaModal(event,this)">
+    <div class="book-card" data-id="{{ $book->id_buku }}" data-judul="{{ strtolower($book->judul_buku) }}" data-penulis="{{ strtolower($book->pengarang) }}" data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}" data-stok="{{ $stok }}" data-cover="{{ $coverUrl }}" data-color="{{ $color }}" data-sinopsis="{{ addslashes($sinopsisSingkat) }}" data-detailurl="{{ route('anggota.buku.show', $book->id_buku) }}" onclick="bukaModal(event,this)">
       <div class="book-cover-wrap">
         @if($coverUrl)
           <img src="{{ $coverUrl }}" class="book-cover-img" alt="{{ $book->judul_buku }}" loading="lazy">
@@ -213,20 +214,6 @@
 </div>
 
 <script>
-// Data buku dari server - dibuat terpisah agar tidak error
-const booksData = @json($ebooks->map(function($book) {
-    return [
-        'id' => $book->id_buku,
-        'judul' => $book->judul_buku,
-        'penulis' => $book->pengarang,
-        'sinopsis' => \Illuminate\Support\Str::limit($book->sinopsis ?? 'Tidak ada sinopsis untuk buku ini.', 300),
-        'stok' => $book->jumlah_ebook ?? 0,
-        'kategori' => $book->kategori->nama_kategori ?? '-',
-        'cover' => !empty($book->cover) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($book->cover) : '',
-        'detailUrl' => route('anggota.buku.show', $book->id_buku)
-    ];
-}));
-
 // Variabel filter
 let isGrid = true;
 let activeCat = 'semua';
@@ -329,21 +316,27 @@ document.getElementById('btnList').addEventListener('click', function() {
 // Modal
 function bukaModal(event, element) {
     event.preventDefault();
-    const id = element.dataset.id;
-    const book = booksData.find(b => b.id == id);
-    if (!book) return;
     
-    const coverHtml = book.cover 
-        ? `<img src="${book.cover}" alt="${book.judul}" style="width:100%;height:100%;object-fit:cover">`
-        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:white;font-size:2rem">📚</div>`;
+    const judul = element.querySelector('.book-name')?.innerText || 'Judul tidak tersedia';
+    const penulis = element.querySelector('.book-author')?.innerText || 'Penulis tidak diketahui';
+    const kategori = element.querySelector('.book-kat')?.innerText || '-';
+    const stok = parseInt(element.dataset.stok) || 0;
+    const cover = element.dataset.cover || '';
+    const sinopsis = element.dataset.sinopsis || 'Tidak ada sinopsis untuk buku ini.';
+    const detailUrl = element.dataset.detailurl || '#';
+    const color = element.dataset.color || 'linear-gradient(135deg,#1d4ed8,#7c3aed)';
+    
+    const coverHtml = cover 
+        ? `<img src="${cover}" alt="${judul}" style="width:100%;height:100%;object-fit:cover">`
+        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:${color};color:white;font-size:2rem">📚</div>`;
     
     document.getElementById('mCover').innerHTML = coverHtml;
-    document.getElementById('mJudul').innerText = book.judul;
-    document.getElementById('mPenulis').innerHTML = `oleh <strong>${book.penulis}</strong> • <span style="background:var(--purple-100);padding:2px 8px;border-radius:4px;font-size:.7rem">${book.kategori}</span> • ${book.stok > 0 ? `<span style="color:#16a34a">${book.stok} tersedia</span>` : '<span style="color:#dc2626">Stok habis</span>'}`;
-    document.getElementById('mSinopsis').innerText = book.sinopsis;
+    document.getElementById('mJudul').innerText = judul;
+    document.getElementById('mPenulis').innerHTML = `oleh <strong>${penulis}</strong> • <span style="background:var(--purple-100);padding:2px 8px;border-radius:4px;font-size:.7rem">${kategori}</span> • ${stok > 0 ? `<span style="color:#16a34a">${stok} tersedia</span>` : '<span style="color:#dc2626">Stok habis</span>'}`;
+    document.getElementById('mSinopsis').innerText = sinopsis;
     document.getElementById('mBtns').innerHTML = `
-        <a href="${book.detailUrl}" class="modal-btn mb-outline"><i class="fas fa-eye"></i> Detail</a>
-        ${book.stok > 0 ? `<a href="${book.detailUrl}" class="modal-btn mb-fill"><i class="fas fa-book-open"></i> Pinjam Sekarang</a>` : `<span class="modal-btn mb-fill" style="background:#6b7280;cursor:not-allowed"><i class="fas fa-times"></i> Stok Habis</span>`}
+        <a href="${detailUrl}" class="modal-btn mb-outline"><i class="fas fa-eye"></i> Detail</a>
+        ${stok > 0 ? `<a href="${detailUrl}" class="modal-btn mb-fill"><i class="fas fa-book-open"></i> Pinjam Sekarang</a>` : `<span class="modal-btn mb-fill" style="background:#6b7280;cursor:not-allowed"><i class="fas fa-times"></i> Stok Habis</span>`}
     `;
     document.getElementById('modalOverlay').classList.add('show');
     document.body.style.overflow = 'hidden';
