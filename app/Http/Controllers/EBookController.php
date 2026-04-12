@@ -169,9 +169,9 @@ class EBookController extends Controller
     }
 
     public function koleksiSaya()
-    {
-        $books     = EBook::with('kategori')->orderBy('id_buku', 'desc')->paginate(24);
-        $kategoris = Kategori::withCount('ebooks')->get();
-        return view('anggota.koleksi_saya', compact('books', 'kategoris'));
-    }
+{
+    $ebooks    = EBook::with('kategori')->orderBy('id_buku', 'desc')->paginate(24);
+    $kategoris = Kategori::withCount('ebooks')->get();
+    return view('anggota.koleksi_saya', compact('ebooks', 'kategoris'));
+}
 }

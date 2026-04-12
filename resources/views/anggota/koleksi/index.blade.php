@@ -381,9 +381,12 @@
   <div class="book-grid" id="bookGrid">
     @forelse($ebooks as $book)
       @php
-        $stok   = $book->jumlah_ebook ?? 0;
-        $hasImg = !empty($book->cover);
-        $coverUrl = $hasImg ? $book->cover : '';
+        $stok = $book->jumlah_ebook ?? 0;
+    $hasImg = !empty($book->cover);
+    // Konversi path ke full Supabase public URL
+    $coverUrl = $hasImg
+        ? Storage::disk('supabase')->url($book->cover)
+        : '';
         $colors = [
           'linear-gradient(135deg,#1d4ed8,#7c3aed)',
           'linear-gradient(135deg,#0f766e,#0891b2)',
@@ -579,7 +582,8 @@ const allBooks=Object.keys(gridCards).map(id=>({
 function applyFilters(){
   let vis=0;
   allBooks.forEach(b=>{
-    const catMatch   = activeCat==='semua'||b.cat===activeCat;
+    // Gunakan == (bukan ===) agar string & number cocok
+    const catMatch   = activeCat==='semua' || b.cat == activeCat;
     const searchMatch= !activeSearch||b.judul.includes(activeSearch)||b.penulis.includes(activeSearch);
     const availMatch = activeAvail==='semua'||(activeAvail==='tersedia'&&b.stok>0)||(activeAvail==='habis'&&b.stok===0);
     const show=catMatch&&searchMatch&&availMatch;
@@ -587,12 +591,6 @@ function applyFilters(){
     if(b.l) b.l.style.display=(!isGrid&&show)?'':'none';
     if(show) vis++;
   });
-  document.getElementById('resultInfo').innerHTML=`Menampilkan <strong>${vis}</strong> dari ${allBooks.length} buku`;
-  const empty=document.getElementById('emptyState');
-  empty.classList.toggle('show',vis===0);
-  document.getElementById('emptyText').textContent=activeSearch?`Tidak ada buku untuk "${activeSearch}".`:'Tidak ada buku pada filter ini.';
-}
-
 /* CATEGORY CHIPS */
 document.querySelectorAll('.cat-chip').forEach(btn=>btn.addEventListener('click',()=>{
   document.querySelectorAll('.cat-chip').forEach(b=>b.classList.remove('active'));
