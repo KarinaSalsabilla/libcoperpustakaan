@@ -165,6 +165,9 @@
       box-shadow: 0 2px 10px rgba(124,58,237,.35);
       overflow: hidden; padding: 0; text-decoration: none;
     }
+    .nav-avatar img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+    }
     .nav-logout {
       background: none; border: none; cursor: pointer;
       font-size: .82rem; color: var(--muted);
@@ -616,11 +619,23 @@
         <div class="toggle-thumb"><span id="toggleEmoji">☀️</span></div>
         <span class="toggle-sun">☀️</span>
       </button>
-      <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" title="{{ auth()->user()->name }}">
-        @if(auth()->user()->anggota?->foto)
-          <img src="{{ Storage::url('foto/' . auth()->user()->anggota->foto) }}" alt="{{ auth()->user()->name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      <a href="{{ route('anggota.profile.show') }}" class="nav-avatar" id="navAvatarLink" title="{{ auth()->user()->name }}">
+        @php
+          use Illuminate\Support\Facades\Storage;
+          $fotoFileName = auth()->user()->anggota?->foto;
+          $fotoUrl = null;
+          if ($fotoFileName) {
+              try {
+                  $fotoUrl = Storage::disk('supabase')->url('images/foto/' . $fotoFileName);
+              } catch (\Exception $e) {
+                  $fotoUrl = null;
+              }
+          }
+        @endphp
+        @if($fotoUrl)
+          <img src="{{ $fotoUrl }}" alt="avatar" id="navAvatarImg">
         @else
-          {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+          <span id="navAvatarInitial">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
         @endif
       </a>
       <form method="POST" action="/logout" style="display:inline;">
@@ -1078,4 +1093,5 @@
     });
   </script>
 </body>
+
 </html>
