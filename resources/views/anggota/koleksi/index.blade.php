@@ -237,16 +237,34 @@
 
   <div class="book-grid" id="bookGrid">
     @forelse($ebooks as $book)
-      @php $stok = $book->jumlah_ebook ?? 0; $hasImg = !empty($book->cover); $coverUrl = $hasImg ? Storage::disk('supabase')->url($book->cover) : ''; $color = "linear-gradient(135deg,#1d4ed8,#7c3aed)"; @endphp
+      @php 
+        $stok = $book->jumlah_ebook ?? 0; 
+        $hasImg = !empty($book->cover); 
+        $coverUrl = $hasImg ? Storage::disk('supabase')->url($book->cover) : ''; 
+        $colors = ['linear-gradient(135deg,#1d4ed8,#7c3aed)','linear-gradient(135deg,#0f766e,#0891b2)','linear-gradient(135deg,#b45309,#d97706)','linear-gradient(135deg,#9333ea,#ec4899)'];
+        $color = $colors[$loop->index % count($colors)];
+      @endphp
+      
+      {{-- GRID CARD --}}
       <a href="#" class="book-card grid-item" data-id="{{ $book->id_buku }}" onclick="bukaModal(event,this)">
         <div class="book-cover-wrap">
-          @if($hasImg)<img src="{{ $coverUrl }}" class="book-cover-img" alt="{{ $book->judul_buku }}" referrerpolicy="no-referrer" loading="lazy">@else<div class="book-cover-ph" style="background:{{ $color }};"></div><div class="book-cover-title">{{ Str::limit($book->judul_buku, 32) }}</div>@endif
-          <div class="book-spine"></div><div class="avail-dot {{ $stok > 0 ? 'ok' : 'none' }}"></div>
-          @if($stok > 0)<a href="{{ route('anggota.buku.show', $book->id_buku) }}" class="hover-pinjam" onclick="event.stopPropagation()"><i class="fas fa-book-open"></i> Pinjam</a>@else<span class="hover-pinjam habis"><i class="fas fa-times"></i> Habis</span>@endif
+          @if($hasImg)
+            <img src="{{ $coverUrl }}" class="book-cover-img" alt="{{ $book->judul_buku }}" referrerpolicy="no-referrer" loading="lazy">
+          @else
+            <div class="book-cover-ph" style="background:{{ $color }};"></div>
+            <div class="book-cover-title">{{ Str::limit($book->judul_buku, 32) }}</div>
+          @endif
+          <div class="book-spine"></div>
+          <div class="avail-dot {{ $stok > 0 ? 'ok' : 'none' }}"></div>
+          @if($stok > 0)
+            <a href="{{ route('anggota.buku.show', $book->id_buku) }}" class="hover-pinjam" onclick="event.stopPropagation()"><i class="fas fa-book-open"></i> Pinjam</a>
+          @else
+            <span class="hover-pinjam habis"><i class="fas fa-times"></i> Habis</span>
+          @endif
         </div>
-        <div class="book-name">{{ $book->judul_buku }}</div><div class="book-author">{{ $book->pengarang }}</div>
-        <div class="book-footer"><span class="book-kat">{{ $book->kategori->nama_kategori ?? '-' }}</span><span class="book-stok {{ $stok > 0 ? '' : 'habis' }}">{{ $stok > 0 ? $stok.' tersedia' : 'Habis' }}</span></div>
-      </a>
-      <a href="#" class="list-card list-item" style="display:none;" data-id="{{ $book->id_buku }}" onclick="bukaModal(event,this)">
-        <div class="lc-cover" style="background:{{ $color }}">@if($hasImg)<img src="{{ $coverUrl }}" alt="{{ $book->judul_buku }}" referrerpolicy="no-referrer">@else<div class="lc-cover-ph">📚</div>@endif<div class="lc-spine"></div></div>
-        <div class="lc-info"><
+        <div class="book-name">{{ $book->judul_buku }}</div>
+        <div class="book-author">{{ $book->pengarang }}</div>
+        <div class="book-footer">
+          <span class="book-kat">{{ $book->kategori->nama_kategori ?? '-' }}</span>
+          <span class="book-stok {{ $stok > 0 ? '' : 'habis' }}">{{ $stok > 0 ? $stok.' tersedia' : 'Habis' }}</span>
+        </div
