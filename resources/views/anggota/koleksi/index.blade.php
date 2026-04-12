@@ -161,12 +161,15 @@
   </div>
 
   <div class="book-grid" id="bookGrid">
-    @forelse($ebooks as $book)
+    @php
+      $colors = ['linear-gradient(135deg,#1d4ed8,#7c3aed)','linear-gradient(135deg,#0f766e,#0891b2)','linear-gradient(135deg,#b45309,#d97706)','linear-gradient(135deg,#9333ea,#ec4899)','linear-gradient(135deg,#047857,#059669)','linear-gradient(135deg,#dc2626,#ea580c)'];
+    @endphp
+    
+    @forelse($ebooks as $index => $book)
     @php 
       $stok = $book->jumlah_ebook ?? 0; 
       $coverUrl = !empty($book->cover) ? Storage::disk('supabase')->url($book->cover) : ''; 
-      $colors = ['linear-gradient(135deg,#1d4ed8,#7c3aed)','linear-gradient(135deg,#0f766e,#0891b2)','linear-gradient(135deg,#b45309,#d97706)','linear-gradient(135deg,#9333ea,#ec4899)','linear-gradient(135deg,#047857,#059669)','linear-gradient(135deg,#dc2626,#ea580c)'];
-      $color = $colors[$loop->index % count($colors)];
+      $color = $colors[$index % count($colors)];
     @endphp
     
     <div class="book-card" data-id="{{ $book->id_buku }}" data-judul="{{ strtolower($book->judul_buku) }}" data-penulis="{{ strtolower($book->pengarang) }}" data-kategori="{{ $book->kategori->nama_kategori ?? '-' }}" data-stok="{{ $stok }}" onclick="bukaModal(event,this)">
@@ -210,16 +213,16 @@
 </div>
 
 <script>
-// Data buku dari server
+// Data buku dari server - dibuat terpisah agar tidak error
 const booksData = @json($ebooks->map(function($book) {
     return [
         'id' => $book->id_buku,
         'judul' => $book->judul_buku,
         'penulis' => $book->pengarang,
-        'sinopsis' => Str::limit($book->sinopsis ?? 'Tidak ada sinopsis untuk buku ini.', 300),
+        'sinopsis' => \Illuminate\Support\Str::limit($book->sinopsis ?? 'Tidak ada sinopsis untuk buku ini.', 300),
         'stok' => $book->jumlah_ebook ?? 0,
         'kategori' => $book->kategori->nama_kategori ?? '-',
-        'cover' => !empty($book->cover) ? Storage::disk('supabase')->url($book->cover) : '',
+        'cover' => !empty($book->cover) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($book->cover) : '',
         'detailUrl' => route('anggota.buku.show', $book->id_buku)
     ];
 }));
@@ -244,7 +247,6 @@ function applyFilters() {
         const judul = card.dataset.judul || '';
         const penulis = card.dataset.penulis || '';
         const kategori = card.dataset.kategori || '';
-        const stok = parseInt(card.dataset.stok);
         
         const catMatch = activeCat === 'semua' || kategori === activeCat;
         const searchMatch = searchLower === '' || judul.includes(searchLower) || penulis.includes(searchLower);
@@ -304,6 +306,7 @@ document.getElementById('sortSelect').addEventListener('change', function() {
         return 0;
     });
     cards.forEach(card => bookGrid.appendChild(card));
+    applyFilters();
 });
 
 // View toggle
@@ -312,6 +315,7 @@ document.getElementById('btnGrid').addEventListener('click', function() {
     this.classList.add('active');
     document.getElementById('btnList').classList.remove('active');
     bookGrid.classList.remove('list-view');
+    applyFilters();
 });
 
 document.getElementById('btnList').addEventListener('click', function() {
@@ -319,6 +323,7 @@ document.getElementById('btnList').addEventListener('click', function() {
     this.classList.add('active');
     document.getElementById('btnGrid').classList.remove('active');
     bookGrid.classList.add('list-view');
+    applyFilters();
 });
 
 // Modal
