@@ -570,6 +570,10 @@
           </span>
         </div>
       </a>
+      {{-- DEBUG: hapus setelah fix --}}
+<div style="font-size:10px;color:red;">
+  cover: {{ $book->cover }} | url: {{ $book->cover ? Storage::url($book->cover) : 'KOSONG' }}
+</div>
 
       {{-- LIST CARD --}}
       <a href="#" class="list-card list-item" style="display:none;"
