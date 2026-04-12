@@ -31,7 +31,10 @@ class KoleksiController extends Controller
         }
 
         $ebooks    = $query->paginate(12)->withQueryString();
-        $kategoris = Kategori::orderBy('nama_kategori')->get();
+       $kategoris = Kategori::withCount('ebooks')
+    ->having('ebooks_count', '>', 0)
+    ->orderBy('nama_kategori')
+    ->get();
 
         $sedangDipinjam = Transaksi::where('id_user', Auth::id())
             ->where('status_peminjam', 'pinjam')
