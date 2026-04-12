@@ -536,12 +536,12 @@
     <div class="ph-left">
       <div class="ph-eyebrow"><div class="ph-eyebrow-dot"></div>Perpustakaan Digital</div>
       <h1 class="ph-title">Koleksi <em>Buku</em></h1>
-      <p class="ph-sub">Temukan dan pinjam buku favoritmu dari <strong>{{ $books->total() }} judul</strong> yang tersedia dalam koleksi kami.</p>
+      <p class="ph-sub">Temukan dan pinjam buku favoritmu dari <strong>{{ $ebooks->total() }} judul</strong> yang tersedia dalam koleksi kami.</p>
     </div>
     <div class="ph-stats">
-      <div class="ph-stat"><div class="ph-stat-num">{{ $books->total() }}</div><div class="ph-stat-label">Total Buku</div></div>
+      <div class="ph-stat"><div class="ph-stat-num">{{ $ebooks->total() }}</div><div class="ph-stat-label">Total Buku</div></div>
       <div class="ph-stat"><div class="ph-stat-num">{{ $kategoris->count() }}</div><div class="ph-stat-label">Kategori</div></div>
-      <div class="ph-stat"><div class="ph-stat-num">{{ $books->where('jumlah_ebook','>',0)->count() }}</div><div class="ph-stat-label">Tersedia</div></div>
+      <div class="ph-stat"><div class="ph-stat-num">{{ $ebooks->where('jumlah_ebook','>',0)->count() }}</div><div class="ph-stat-label">Tersedia</div></div>
     </div>
   </div>
 
@@ -571,7 +571,7 @@
                 {{-- Tombol "Semua" — data-cat="semua" --}}
                 <button class="cat-item active" data-cat="semua">
                   Semua
-                  <span class="cat-count">{{ $books->total() }}</span>
+                  <span class="cat-count">{{ $ebooks->total() }}</span>
                 </button>
                 {{-- Tiap kategori pakai id_kategori sebagai data-cat --}}
                 @foreach($kategoris as $kat)
@@ -599,7 +599,7 @@
     <!-- MAIN -->
     <div class="main-content">
       <div class="toolbar">
-        <span class="result-info" id="resultInfo">Menampilkan <strong>{{ $books->count() }}</strong> dari {{ $books->total() }} buku</span>
+        <span class="result-info" id="resultInfo">Menampilkan <strong>{{ $ebooks->count() }}</strong> dari {{ $ebooks->total() }} buku</span>
         <select class="sort-select" id="sortSelect">
           <option value="default">Terbaru</option>
           <option value="az">Judul A–Z</option>
@@ -615,7 +615,7 @@
       <div class="active-filters" id="activeFilters"></div>
 
       <div class="book-grid" id="bookGrid">
-        @forelse($books as $book)
+        @forelse($ebooks as $book)
           @php
             $stok   = $book->jumlah_ebook ?? 0;
             $hasImg = !empty($book->cover);
@@ -748,7 +748,7 @@
         </div>
       </div>
 
-      <div class="pagination-wrap">{{ $books->links() }}</div>
+      <div class="pagination-wrap">{{ $ebooks->links() }}</div>
     </div>
   </div>
 </div>
