@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\AnggotaController;
 use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Controllers\Admin\LaporanController;
-use App\Http\Controllers\Admin\AdminDashboardController; // ✅ TAMBAH INI
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Anggota\KoleksiController;
 use App\Http\Controllers\Admin\PengaturanController;
@@ -30,6 +30,7 @@ Route::get('/', function () {
     $kategoris = \App\Models\Kategori::all();
     return view('home.index', compact('books', 'kategoris'));
 });
+
 /*
 |--------------------------------------------------------------------------
 | AUTH
@@ -140,8 +141,12 @@ Route::middleware(['auth', 'admin'])
         // GENRE
         Route::resource('genre', GenreController::class)->except(['show']);
 
-        // ANGGOTA
+        // ANGGOTA (RESOURCE + TAMBAHAN ROUTE FOTO)
         Route::resource('anggota', AnggotaController::class)->except(['create', 'store']);
+        
+        // ✅ TAMBAHKAN ROUTE UNTUK FOTO ANGGOTA
+        Route::post('/anggota/{id}/upload-foto', [AnggotaController::class, 'uploadFoto'])->name('anggota.upload-foto');
+        Route::delete('/anggota/{id}/delete-foto', [AnggotaController::class, 'deleteFoto'])->name('anggota.delete-foto');
 
         // TRANSAKSI
         Route::resource('transaksi', TransaksiController::class)->except(['show']);
@@ -160,7 +165,7 @@ Route::middleware(['auth', 'admin'])
         Route::put('/pengaturan/aplikasi', [PengaturanController::class, 'updateAplikasi'])->name('pengaturan.aplikasi');
         Route::put('/pengaturan/tema',     [PengaturanController::class, 'updateTema'])->name('pengaturan.tema');
 
-        //KARYA
+        // KARYA
         Route::get('/karya', function () {
             return view('admin.karya');
         })->name('karya.index');
@@ -174,8 +179,8 @@ Route::middleware(['auth', 'admin'])
         Route::delete('/buku/{id}',   [EBookController::class, 'destroy'])->name('buku.destroy');
     });
 
-  Route::get('/debug-disk', function () {
-    $book = DB::table('e_books')->first(); // coba ini
+Route::get('/debug-disk', function () {
+    $book = DB::table('e_books')->first();
     return [
         'filesystem_disk' => config('filesystems.default'),
         'cover_path'      => $book->cover ?? 'null',

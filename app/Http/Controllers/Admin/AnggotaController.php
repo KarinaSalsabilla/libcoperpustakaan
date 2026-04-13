@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class AnggotaController extends Controller
@@ -87,6 +88,7 @@ class AnggotaController extends Controller
 
         return view('admin.anggota.show', compact('anggota', 'totalPeminjaman', 'riwayat'));
     }
+    
     /**
      * Show the form for editing the specified resource.
      */
@@ -120,10 +122,30 @@ class AnggotaController extends Controller
             'tempat_lahir' => 'nullable|max:30',
             'tgl_lahir' => 'nullable|date',
             'kota' => 'nullable|max:20',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Tambahkan validasi foto
         ]);
 
         DB::beginTransaction();
         try {
+            // Handle foto upload
+            if ($request->hasFile('foto')) {
+                // Cek dan hapus foto lama
+                $oldFoto = DB::table('anggota')->where('id_user', $id)->value('foto');
+                if ($oldFoto && Storage::disk('public')->exists('foto/' . $oldFoto)) {
+                    Storage::disk('public')->delete('foto/' . $oldFoto);
+                }
+                
+                // Upload foto baru
+                $file = $request->file('foto');
+                $filename = time() . '_' . $id . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('foto', $filename, 'public');
+                
+                // Update data anggota dengan nama file foto
+                DB::table('anggota')
+                    ->where('id_user', $id)
+                    ->update(['foto' => $filename]);
+            }
+            
             // Update users table
             $userData = [
                 'email' => $request->email,
@@ -139,18 +161,20 @@ class AnggotaController extends Controller
                 ->where('id_user', $id)
                 ->update($userData);
 
-            // Update anggota table
+            // Update anggota table (tanpa foto jika tidak diupload)
+            $anggotaData = [
+                'nama' => $request->nama,
+                'nohp' => $request->nohp,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'agama' => $request->agama,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tgl_lahir' => $request->tgl_lahir,
+                'kota' => $request->kota,
+            ];
+            
             DB::table('anggota')
                 ->where('id_user', $id)
-                ->update([
-                    'nama' => $request->nama,
-                    'nohp' => $request->nohp,
-                    'jenis_kelamin' => $request->jenis_kelamin,
-                    'agama' => $request->agama,
-                    'tempat_lahir' => $request->tempat_lahir,
-                    'tgl_lahir' => $request->tgl_lahir,
-                    'kota' => $request->kota,
-                ]);
+                ->update($anggotaData);
 
             DB::commit();
 
@@ -169,6 +193,12 @@ class AnggotaController extends Controller
     {
         DB::beginTransaction();
         try {
+            // Hapus foto jika ada
+            $foto = DB::table('anggota')->where('id_user', $id)->value('foto');
+            if ($foto && Storage::disk('public')->exists('foto/' . $foto)) {
+                Storage::disk('public')->delete('foto/' . $foto);
+            }
+            
             // Delete from anggota table first (foreign key)
             DB::table('anggota')->where('id_user', $id)->delete();
 
@@ -182,6 +212,87 @@ class AnggotaController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menghapus anggota: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Upload foto anggota
+     */
+    public function uploadFoto(Request $request, $id)
+    {
+        $request->validate([
+            'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+        
+        DB::beginTransaction();
+        try {
+            // Cek anggota exists
+            $anggota = DB::table('anggota')->where('id_user', $id)->first();
+            if (!$anggota) {
+                return response()->json(['error' => 'Anggota tidak ditemukan'], 404);
+            }
+            
+            // Hapus foto lama jika ada
+            if ($anggota->foto && Storage::disk('public')->exists('foto/' . $anggota->foto)) {
+                Storage::disk('public')->delete('foto/' . $anggota->foto);
+            }
+            
+            // Upload foto baru
+            $file = $request->file('foto');
+            $filename = time() . '_' . $id . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('foto', $filename, 'public');
+            
+            // Update database
+            DB::table('anggota')
+                ->where('id_user', $id)
+                ->update(['foto' => $filename]);
+            
+            DB::commit();
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'foto_url' => asset('storage/foto/' . $filename),
+                    'message' => 'Foto berhasil diupload'
+                ]);
+            }
+            
+            return back()->with('success', 'Foto berhasil diupload');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Gagal upload foto: ' . $e->getMessage()], 500);
+            }
+            return back()->with('error', 'Gagal upload foto: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Hapus foto anggota
+     */
+    public function deleteFoto($id)
+    {
+        DB::beginTransaction();
+        try {
+            $anggota = DB::table('anggota')->where('id_user', $id)->first();
+            
+            if ($anggota && $anggota->foto) {
+                // Hapus file foto
+                if (Storage::disk('public')->exists('foto/' . $anggota->foto)) {
+                    Storage::disk('public')->delete('foto/' . $anggota->foto);
+                }
+                
+                // Hapus record di database
+                DB::table('anggota')
+                    ->where('id_user', $id)
+                    ->update(['foto' => null]);
+            }
+            
+            DB::commit();
+            return back()->with('success', 'Foto berhasil dihapus');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menghapus foto: ' . $e->getMessage());
         }
     }
 
@@ -216,10 +327,29 @@ class AnggotaController extends Controller
             'tempat_lahir' => 'nullable|max:30',
             'tgl_lahir' => 'nullable|date',
             'kota' => 'nullable|max:20',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         DB::beginTransaction();
         try {
+            // Handle foto upload untuk profile user
+            if ($request->hasFile('foto')) {
+                $userId = auth()->user()->id_user;
+                $oldFoto = DB::table('anggota')->where('id_user', $userId)->value('foto');
+                
+                if ($oldFoto && Storage::disk('public')->exists('foto/' . $oldFoto)) {
+                    Storage::disk('public')->delete('foto/' . $oldFoto);
+                }
+                
+                $file = $request->file('foto');
+                $filename = time() . '_' . $userId . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('foto', $filename, 'public');
+                
+                DB::table('anggota')
+                    ->where('id_user', $userId)
+                    ->update(['foto' => $filename]);
+            }
+            
             // Update tabel anggota
             DB::table('anggota')
                 ->where('id_user', auth()->user()->id_user)

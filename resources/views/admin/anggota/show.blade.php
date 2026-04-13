@@ -33,9 +33,29 @@
                       border:3px solid rgba(255,255,255,.35);display:flex;align-items:center;
                       justify-content:center;font-size:2.2rem;color:white;
                       background:rgba(255,255,255,.2);">
-            @if($anggota->foto)
-              <img src="{{ Storage::url('foto/' . $anggota->foto) }}"
-                   style="width:100%;height:100%;object-fit:cover;" alt="">
+            @php
+              $fotoUrl = null;
+              $hasFoto = false;
+              
+              if(!empty($anggota->foto)) {
+                  // Cek apakah foto ada di storage
+                  if(Storage::disk('public')->exists('foto/' . $anggota->foto)) {
+                      $fotoUrl = asset('storage/foto/' . $anggota->foto);
+                      $hasFoto = true;
+                  } 
+                  // Cek apakah foto menggunakan path lengkap
+                  elseif(filter_var($anggota->foto, FILTER_VALIDATE_URL)) {
+                      $fotoUrl = $anggota->foto;
+                      $hasFoto = true;
+                  }
+              }
+            @endphp
+            
+            @if($hasFoto && $fotoUrl)
+              <img src="{{ $fotoUrl }}"
+                   style="width:100%;height:100%;object-fit:cover;" 
+                   alt="Foto {{ $anggota->nama }}"
+                   onerror="this.onerror=null; this.parentElement.innerHTML='{{ strtoupper(substr($anggota->nama ?? 'A', 0, 1)) }}';">
             @else
               {{ strtoupper(substr($anggota->nama ?? 'A', 0, 1)) }}
             @endif
