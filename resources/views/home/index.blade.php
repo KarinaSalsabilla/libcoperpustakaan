@@ -194,54 +194,54 @@
     </div>
 
     <section id="fitur" class="relative py-12 sm:py-20 bg-gradient-to-br from-blue-600 to-purple-700">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div class="text-center mb-10 sm:mb-16">
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Kenapa Memilih Libco?</h2>
-                <p class="text-base sm:text-xl text-blue-100">Platform perpustakaan digital terlengkap dan termudah</p>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-12">
+        <div class="text-center mb-10 sm:mb-16">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Kenapa Memilih Libco?</h2>
+            <p class="text-base sm:text-xl text-blue-100">Platform perpustakaan digital terlengkap dan termudah</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+            <div class="feature-card p-6 sm:p-8 rounded-2xl hover-scale bg-white/10 dark:bg-white/5 backdrop-blur-sm">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600
+                          rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-white dark:text-white">Ribuan Buku</h3>
+                <p class="text-sm sm:text-base text-gray-100 dark:text-gray-200">Akses koleksi lebih dari 10.000 buku
+                    digital dari berbagai kategori dan genre</p>
             </div>
 
-            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-                <div class="feature-card p-6 sm:p-8 rounded-2xl hover-scale">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600
-                              rounded-xl flex items-center justify-center mb-4 sm:mb-6">
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-white">Ribuan Buku</h3>
-                    <p class="text-sm sm:text-base text-gray-300 dark:text-gray-200">Akses koleksi lebih dari 10.000 buku
-                        digital dari berbagai kategori dan genre</p>
+            <div class="feature-card p-6 sm:p-8 rounded-2xl hover-scale bg-white/10 dark:bg-white/5 backdrop-blur-sm">
+                <div
+                    class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                 </div>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-white dark:text-white">24/7 Akses</h3>
+                <p class="text-sm sm:text-base text-gray-100 dark:text-gray-200">Baca kapan saja dan di mana saja, tanpa
+                    batasan waktu dan tempat</p>
+            </div>
 
-                <div class="feature-card p-6 sm:p-8 rounded-2xl hover-scale">
-                    <div
-                        class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-white">24/7 Akses</h3>
-                    <p class="text-sm sm:text-base text-gray-300 dark:text-gray-200">Baca kapan saja dan di mana saja, tanpa
-                        batasan waktu dan tempat</p>
+            <div class="feature-card p-6 sm:p-8 rounded-2xl hover-scale bg-white/10 dark:bg-white/5 backdrop-blur-sm sm:col-span-2 md:col-span-1">
+                <div
+                    class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
                 </div>
-
-                <div class="feature-card p-6 sm:p-8 rounded-2xl hover-scale sm:col-span-2 md:col-span-1">
-                    <div
-                        class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-white">Super Cepat</h3>
-                    <p class="text-sm sm:text-base text-gray-300 dark:text-gray-200">Loading cepat dengan teknologi cloud
-                        terkini untuk pengalaman membaca terbaik</p>
-                </div>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-white dark:text-white">Super Cepat</h3>
+                <p class="text-sm sm:text-base text-gray-100 dark:text-gray-200">Loading cepat dengan teknologi cloud
+                    terkini untuk pengalaman membaca terbaik</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <section id="tentangkami" class="py-12 sm:py-20 bg-white dark:bg-gray-900">
         <div class="container mx-auto px-4 sm:px-6 lg:px-12">
