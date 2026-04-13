@@ -74,9 +74,22 @@ class AnggotaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+     public function show($id)
     {
         $anggota = \App\Models\Anggota::with('user')->findOrFail($id);
+        
+        // Cek foto dari storage yang benar
+        $fotoUrl = null;
+        if ($anggota->foto) {
+            // Coba cek di public disk dulu
+            if (Storage::disk('public')->exists('foto/' . $anggota->foto)) {
+                $fotoUrl = asset('storage/foto/' . $anggota->foto);
+            }
+            // Coba cek di supabase disk
+            elseif (Storage::disk('supabase')->exists('images/foto/' . $anggota->foto)) {
+                $fotoUrl = Storage::disk('supabase')->url('images/foto/' . $anggota->foto);
+            }
+        }
 
         $totalPeminjaman = \App\Models\Transaksi::where('id_user', $id)->count();
 
@@ -86,7 +99,7 @@ class AnggotaController extends Controller
             ->take(10)
             ->get();
 
-        return view('admin.anggota.show', compact('anggota', 'totalPeminjaman', 'riwayat'));
+        return view('admin.anggota.show', compact('anggota', 'totalPeminjaman', 'riwayat', 'fotoUrl'));
     }
     
     /**
